@@ -29,13 +29,15 @@ async function ownerCommand(sock, chatId, senderId, mentionedJids, message, args
                     + 'TEL;type=CELL;type=VOICE;waid=' + ownerNumber + ':+' + ownerNumber + '\n'
                     + 'END:VCARD';
 
+        const { channelInfo } = require("../lib/messageConfig");
         await sock.sendMessage(
             chatId,
             { 
                 contacts: { 
                     displayName: botOwner, 
                     contacts: [{ vcard }] 
-                }
+                },
+                ...channelInfo
             },
             { quoted: message }
         );

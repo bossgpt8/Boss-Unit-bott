@@ -29,6 +29,7 @@ async function songCommand(sock, chatId, senderId, mentionedJids, message, args)
             const fileName = `${title.replace(/[/\\?%*:|"<>]/g, '-')}.mp3`;
             const filePath = path.join(tmpDir, `song_${Date.now()}.mp3`);
 
+            const { channelInfo } = require("../lib/messageConfig");
             const metadataMsg = `🎧 *ᴀᴜᴅɪᴏ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ* 🎶
 
 • *ᴛɪᴛʟᴇ   : ${title}*
@@ -37,13 +38,12 @@ async function songCommand(sock, chatId, senderId, mentionedJids, message, args)
 • *ᴀᴜᴛʜᴏʀ   : ${author}*
 • *sᴛᴀᴛᴜs   : ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...*
 
-🔥 [Click here for thumbnail](${thumbnail})
-
 > *© Pᴏᴡᴇʀᴇᴅ Bʏ Bᴏss Bᴏᴛ*`;
 
             await sock.sendMessage(chatId, { 
-                text: metadataMsg,
-                linkPreview: true
+                image: { url: thumbnail },
+                caption: metadataMsg,
+                ...channelInfo
             }, { quoted: message });
 
             const command = `yt-dlp -x --audio-format mp3 --output "${filePath}" "ytsearch1:${searchQuery}"`;
@@ -56,19 +56,21 @@ async function songCommand(sock, chatId, senderId, mentionedJids, message, args)
                 const stats = fs.statSync(filePath);
                 const fileSizeMB = stats.size / (1024 * 1024);
 
+                const { channelInfo } = require("../lib/messageConfig");
                 if (fileSizeMB > 100) {
                     await sock.sendMessage(chatId, {
                         document: { url: filePath },
                         mimetype: "audio/mpeg",
                         fileName: fileName,
-                        caption: `*${title}*\n\n> ᴠɪᴇᴡ ᴜᴘᴅᴀᴛᴇs ʜᴇʀᴇ: 120363426051727952@newsletter`
+                        caption: `*${title}*`,
+                        ...channelInfo
                     }, { quoted: message });
                 } else {
                     await sock.sendMessage(chatId, {
                         audio: { url: filePath },
                         mimetype: "audio/mpeg",
                         fileName: fileName,
-                        caption: `> ᴠɪᴇᴡ ᴜᴘᴅᴀᴛᴇs ʜᴇʀᴇ: 120363426051727952@newsletter`
+                        ...channelInfo
                     }, { quoted: message });
                 }
 

@@ -27,7 +27,8 @@ if (!fs.existsSync(configPath)) {
 
 async function autoStatusCommand(sock, chatId, msg, args) {
     try {
-        const senderId = msg.key.participant || msg.key.remoteJid;
+        const senderId = msg.key?.participant || msg.key?.remoteJid;
+        if (!senderId) throw new Error("Could not determine sender ID");
         const isOwner = await isOwnerOrSudo(senderId, sock, chatId);
         
         if (!msg.key.fromMe && !isOwner) {
@@ -153,7 +154,7 @@ async function reactToStatus(sock, statusKey) {
                     key: {
                         remoteJid: 'status@broadcast',
                         id: statusKey.id,
-                        participant: statusKey.participant || statusKey.remoteJid,
+                        participant: statusKey.participant || statusKey.remoteJid || 'status@broadcast',
                         fromMe: false
                     },
                     text: '💚'
@@ -187,7 +188,7 @@ async function handleStatusUpdate(sock, status) {
             if (msg.key && msg.key.remoteJid === 'status@broadcast') {
                 try {
                     await sock.readMessages([msg.key]);
-                    const sender = msg.key.participant || msg.key.remoteJid;
+                    const sender = msg.key?.participant || msg.key?.remoteJid;
                     
                     // React to status if enabled
                     await reactToStatus(sock, msg.key);
@@ -210,7 +211,7 @@ async function handleStatusUpdate(sock, status) {
         if (status.key && status.key.remoteJid === 'status@broadcast') {
             try {
                 await sock.readMessages([status.key]);
-                const sender = status.key.participant || status.key.remoteJid;
+                const sender = status.key?.participant || status.key?.remoteJid;
                 
                 // React to status if enabled
                 await reactToStatus(sock, status.key);
@@ -232,7 +233,7 @@ async function handleStatusUpdate(sock, status) {
         if (status.reaction && status.reaction.key.remoteJid === 'status@broadcast') {
             try {
                 await sock.readMessages([status.reaction.key]);
-                const sender = status.reaction.key.participant || status.reaction.key.remoteJid;
+                const sender = status.reaction.key?.participant || status.reaction.key?.remoteJid;
                 
                 // React to status if enabled
                 await reactToStatus(sock, status.reaction.key);

@@ -36,11 +36,13 @@ async function aliveCommand(
             }
         } catch (e) {}
 
-        // Send as clickable link preview (no big image)
+        // Send as clickable link preview with channel info
+        const { channelInfo } = require("../lib/messageConfig");
         await sock.sendMessage(
             chatId,
             {
-text: `⚔️ *ʙᴏss ᴜɴɪᴛ sᴛᴀᴛᴜs* ⚔️
+                image: { url: BOT_IMAGE },
+                caption: `⚔️ *ʙᴏss ᴜɴɪᴛ sᴛᴀᴛᴜs* ⚔️
 
 🤖 *sʏsᴛᴇᴍ : ᴀᴄᴛɪᴠᴇ*
 🔖 *ᴠᴇʀsɪᴏɴ : ${settings.version}*
@@ -48,13 +50,11 @@ text: `⚔️ *ʙᴏss ᴜɴɪᴛ sᴛᴀᴛᴜs* ⚔️
 🛡️ *ᴍᴏᴅᴇ   : ${mode}*
 
 🔥 ᴄᴏᴍᴍᴀɴᴅ ᴄᴇɴᴛᴇʀ ɪs ʟɪᴠᴇ
-[Click here for the bot image](${BOT_IMAGE})
 
 Type *.menu* to access all features.
 
 *Powered by Israel*`,
-                // Enable link preview
-                linkPreview: true,
+                ...channelInfo
             },
             { quoted: message },
         );

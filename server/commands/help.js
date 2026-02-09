@@ -1,6 +1,14 @@
 const fs = require("fs");
 
-async function helpCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
+async function helpCommand(
+  sock,
+  chatId,
+  senderId,
+  mentionedJids,
+  message,
+  args,
+  userId,
+) {
   try {
     // Uptime
     const uptimeSec = Math.floor(process.uptime());
@@ -10,12 +18,12 @@ async function helpCommand(sock, chatId, senderId, mentionedJids, message, args,
     const runtimeStr = `${days}d ${hoursU}h ${minutesU}m`;
 
     // Bot info
-    const botNameStr = 'ʙᴏss ʙᴏᴛ';
-    const ownerStr = 'ɪsʀᴀᴇʟ';
-    const accessStr = 'ᴘᴜʙʟɪᴄ';
-    const buildStr = 'ᴠ2.0.0';
+    const botNameStr = "ʙᴏss ʙᴏᴛ";
+    const ownerStr = "ɪsʀᴀᴇʟ";
+    const accessStr = "ᴘᴜʙʟɪᴄ";
+    const buildStr = "ᴠ2.0.0";
 
-    // Menu in full small Unicode
+    const { channelInfo } = require("../lib/messageConfig");
     const menuText = `*╭━━━━━━━━━━━━━━━━━━━━━━━━━━╮*
 *⚡  ʙᴏss ʙᴏᴛ  ⚡*
 *╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯*
@@ -32,75 +40,74 @@ async function helpCommand(sock, chatId, senderId, mentionedJids, message, args,
 *━━━━━━━━━━━━━━━━━━━━━━*
 *2️⃣ ᴄᴏʀᴇ ᴄᴏɴᴛʀᴏʟs*
 *━━━━━━━━━━━━━━━━━━━━━━*
-*.ʙᴀɴ / .ᴜɴʙᴀɴ @ᴜsᴇʀ
-*.ᴘʀᴏᴍᴏᴛᴇ @ᴜsᴇʀ
-*.ᴅᴇᴍᴏᴛᴇ @ᴜsᴇʀ
-*.ᴄʟᴇᴀʀsᴇssɪᴏɴ
-*.sᴇᴛᴛɪɴɢs
-*.ᴍᴏᴅᴇ ᴘᴜʙʟɪᴄ | ᴘʀɪᴠᴀᴛᴇ
-*.ᴄʟᴇᴀʀᴛᴍᴘ
-*.ᴀɴᴛɪᴅᴇʟᴇᴛᴇ on | off
-*.ᴀɴᴛɪᴄᴀʟʟ on | off
-*.ᴘᴍʙʟᴏᴄᴋᴇʀ on | off | sᴛᴀᴛᴜs
-*.ᴘᴍʙʟᴏᴄᴋᴇʀ sᴇᴛᴍsɢ <ᴛᴇxᴛ>
-*.sᴇᴛᴘᴘ (ʀᴇᴘʟʏ ɪᴍᴀɢᴇ)
-*.sᴇᴛᴍᴇɴᴛɪᴏɴ (ʀᴇᴘʟʏ ᴍsɢ/ᴍᴇᴅɪᴀ)
-*.ᴍᴇɴᴛɪᴏɴ on | off
-*.ᴀᴜᴛᴏʀᴇᴀᴄᴛ on | off
-*.ᴀᴜᴛᴏsᴛᴀᴛᴜs on | off
-*.ᴀᴜᴛᴏᴛʏᴘɪɴɢ on | off
-*.ᴀᴜᴛᴏʀᴇᴀᴅ on | off
+*.ʙᴀɴ / .ᴜɴʙᴀɴ @ᴜsᴇʀ*
+*.ᴘʀᴏᴍᴏᴛᴇ @ᴜsᴇʀ*
+*.ᴅᴇᴍᴏᴛᴇ @ᴜsᴇʀ*
+*.sᴇᴛᴛɪɴɢs*
+*.ᴍᴏᴅᴇ ᴘᴜʙʟɪᴄ | ᴘʀɪᴠᴀᴛᴇ*
+*.ᴄʟᴇᴀʀᴛᴍᴘ*
+*.ᴀɴᴛɪᴅᴇʟᴇᴛᴇ on | off*
+*.ᴀɴᴛɪᴄᴀʟʟ on | off*
+*.ᴘᴍʙʟᴏᴄᴋᴇʀ on | off | sᴛᴀᴛᴜs*
+*.ᴘᴍʙʟᴏᴄᴋᴇʀ sᴇᴛᴍsɢ <ᴛᴇxᴛ>*
+*.sᴇᴛᴘᴘ (ʀᴇᴘʟʏ ɪᴍᴀɢᴇ)*
+*.sᴇᴛᴍᴇɴᴛɪᴏɴ (ʀᴇᴘʟʏ ᴍsɢ/ᴍᴇᴅɪᴀ)*
+*.ᴍᴇɴᴛɪᴏɴ on | off*
+*.ᴀᴜᴛᴏʀᴇᴀᴄᴛ on | off*
+*.ᴀᴜᴛᴏsᴛᴀᴛᴜs on | off*
+*.ᴀᴜᴛᴏᴛʏᴘɪɴɢ on | off*
+*.ᴀᴜᴛᴏʀᴇᴀᴅ on | off*
 
 *━━━━━━━━━━━━━━━━━━━━━━*
 *3️⃣ ʙᴀsɪᴄ ᴄᴏᴍᴍᴀɴᴅs*
 *━━━━━━━━━━━━━━━━━━━━━━*
-*.ᴍᴇɴᴜ / .ʜᴇʟᴘ
-*.ᴘɪɴɢ
-*.ᴀʟɪᴠᴇ
-*.ᴏᴡɴᴇʀ
-*.ᴊɪᴅ
-*.ᴜʀʟ
-*.ᴛᴛs <ᴛᴇxᴛ>
-*.ᴊᴏᴋᴇ
-*.ǫᴜᴏᴛᴇ
-*.ғᴀᴄᴛ
-*.ᴡᴇᴀᴛʜᴇʀ <ᴄɪᴛʏ>
-*.ɴᴇᴡs
-*.ʟʏʀɪᴄs <sᴏɴɢ>
-*.8ʙᴀʟʟ <ǫᴜᴇsᴛɪᴏɴ>
-*.ɢʀᴏᴜᴘɪɴғᴏ
-*.sᴛᴀғғ / .ᴀᴅᴍɪɴs
-*.ᴛʀᴀɴsʟᴀᴛᴇ <ᴛᴇxᴛ> <ʟᴀɴɢ>
-*.sᴄʀᴇᴇɴsʜᴏᴛ <ʟɪɴᴋ>
-*.ᴠɪᴇᴡᴏɴᴄᴇ
+*.ᴍᴇɴᴜ / .ʜᴇʟᴘ*
+*.ᴘɪɴɢ*
+*.ᴀʟɪᴠᴇ*
+*.ᴏᴡɴᴇʀ*
+*.ᴊɪᴅ*
+*.ᴜʀʟ*
+*.ᴛᴛs <ᴛᴇxᴛ>*
+*.ᴊᴏᴋᴇ*
+*.ǫᴜᴏᴛᴇ*
+*.ғᴀᴄᴛ*
+*.ᴡᴇᴀᴛʜᴇʀ <ᴄɪᴛʏ>*
+*.ɴᴇᴡs*
+*.ʟʏʀɪᴄs <sᴏɴɢ>*
+*.8ʙᴀʟʟ <ǫᴜᴇsᴛɪᴏɴ>*
+*.ɢʀᴏᴜᴘɪɴғᴏ*
+*.sᴛᴀғғ / .ᴀᴅᴍɪɴs*
+*.ᴛʀᴀɴsʟᴀᴛᴇ <ᴛᴇxᴛ> <ʟᴀɴɢ>*
+*.sᴄʀᴇᴇɴsʜᴏᴛ <ʟɪɴᴋ>*
+*.ᴠɪᴇᴡᴏɴᴄᴇ*
 
 *━━━━━━━━━━━━━━━━━━━━━━*
 *4️⃣ ɢʀᴏᴜᴘ ᴍᴀɴᴀɢᴇᴍᴇɴᴛ*
 *━━━━━━━━━━━━━━━━━━━━━━*
-*.ᴀᴅᴅ @ᴜsᴇʀ
-*.ᴋɪᴄᴋ @ᴜsᴇʀ
-*.ᴅᴇʟᴇᴛᴇ / .ᴅᴇʟ
-*.ᴍᴜᴛᴇ <ᴍɪɴᴜᴛᴇs>
-*.ᴜɴᴍᴜᴛᴇ
-*.ᴡᴀʀɴ @ᴜsᴇʀ
-*.ᴡᴀʀɴɪɴɢs @ᴜsᴇʀ
-*.ᴏᴘᴇɴ
-*.ᴄʟᴏsᴇ
-*.ᴄʟᴇᴀʀ
-*.ᴛᴀɢ <ᴍᴇssᴀɢᴇ>
-*.ᴛᴀɢᴀʟʟ
-*.ʜɪᴅᴇᴛᴀɢ <ᴍᴇssᴀɢᴇ>
-*.ᴛᴀɢɴᴏᴛᴀᴅᴍɪɴ
-*.ᴀɴᴛɪʟɪɴᴋ on | off
-*.ᴀɴᴛɪʙᴀᴅᴡᴏʀᴅ on | off
-*.ᴀɴᴛɪᴛᴀɢ on | off
-*.ᴄʜᴀᴛʙᴏᴛ on | off
-*.ᴡᴇʟᴄᴏᴍᴇ on | off
-*.ɢᴏᴏᴅʙʏᴇ on | off
-*.ʀᴇsᴇᴛʟɪɴᴋ
-*.sᴇᴛɢɴᴀᴍᴇ <ɴᴀᴍᴇ>
-*.sᴇᴛɢᴅᴇsᴄ <ᴅᴇsᴄʀɪᴘᴛɪᴏɴ>
-*.sᴇᴛɢᴘᴘ (ʀᴇᴘʟʏ ɪᴍᴀɢᴇ)
+*.ᴀᴅᴅ @ᴜsᴇʀ*
+*.ᴋɪᴄᴋ @ᴜsᴇʀ*
+*.ᴅᴇʟᴇᴛᴇ / .ᴅᴇʟ*
+*.ᴍᴜᴛᴇ <ᴍɪɴᴜᴛᴇs>*
+*.ᴜɴᴍᴜᴛᴇ*
+*.ᴡᴀʀɴ @ᴜsᴇʀ*
+*.ᴡᴀʀɴɪɴɢs @ᴜsᴇʀ*
+*.ᴏᴘᴇɴ*
+*.ᴄʟᴏsᴇ*
+*.ᴄʟᴇᴀʀ*
+*.ᴛᴀɢ <ᴍᴇssᴀɢᴇ>*
+*.ᴛᴀɢᴀʟʟ*
+*.ʜɪᴅᴇᴛᴀɢ <ᴍᴇssᴀɢᴇ>*
+*.ᴛᴀɢɴᴏᴛᴀᴅᴍɪɴ*
+*.ᴀɴᴛɪʟɪɴᴋ on | off*
+*.ᴀɴᴛɪʙᴀᴅᴡᴏʀᴅ on | off*
+*.ᴀɴᴛɪᴛᴀɢ on | off*
+*.ᴄʜᴀᴛʙᴏᴛ on | off*
+*.ᴡᴇʟᴄᴏᴍᴇ on | off*
+*.ɢᴏᴏᴅʙʏᴇ on | off*
+*.ʀᴇsᴇᴛʟɪɴᴋ*
+*.sᴇᴛɢɴᴀᴍᴇ <ɴᴀᴍᴇ>*
+*.sᴇᴛɢᴅᴇsᴄ <ᴅᴇsᴄʀɪᴘᴛɪᴏɴ>*
+*.sᴇᴛɢᴘᴘ (ʀᴇᴘʟʏ ɪᴍᴀɢᴇ)*
 
 *━━━━━━━━━━━━━━━━━━━━━━*
 *5️⃣ ᴍᴇᴅɪᴀ ᴛᴏᴏʟs*
@@ -125,19 +132,20 @@ async function helpCommand(sock, chatId, senderId, mentionedJids, message, args,
 *.ᴄʜɪɴᴀ*
 *.ɪɴᴅᴏɴᴇsɪᴀ*
 *.ᴊᴀᴘᴀɴ*
+*.ɪɴᴅɪᴀ*
 *.ᴋᴏʀᴇᴀ*
 *.ʜɪᴊᴀʙ*
 
 *━━━━━━━━━━━━━━━━━━━━━━*
 *7️⃣ ᴘʟᴀʏ ᴢᴏɴᴇ*
 *━━━━━━━━━━━━━━━━━━━━━━*
-*.ᴛɪᴄᴛᴀᴄᴛᴏᴇ @ᴜsᴇʀ
-*.ʜᴀɴɢᴍᴀɴ
+*.ᴛɪᴄᴛᴀᴄᴛᴏᴇ @ᴜsᴇʀ*
+*.ʜᴀɴɢᴍᴀɴ*
 *.ɢᴜᴇss <ʟᴇᴛᴛᴇʀ>*
-*.ᴛʀɪᴠɪᴀ
-*.ᴀɴswer <ᴀɴsᴡᴇʀ>*
-*.ᴛʀᴜᴛʜ
-*.ᴅᴀʀᴇ
+*.ᴛʀɪᴠɪᴀ*
+*.ᴀɴsᴡᴇʀ <ᴀɴsᴡᴇʀ>*
+*.ᴛʀᴜᴛʜ*
+*.ᴅᴀʀᴇ*
 
 *━━━━━━━━━━━━━━━━━━━━━━*
 *8️⃣ ᴀɪ ʟᴀʙ*
@@ -150,13 +158,13 @@ async function helpCommand(sock, chatId, senderId, mentionedJids, message, args,
 *━━━━━━━━━━━━━━━━━━━━━━*
 *9️⃣ ᴇɴᴛᴇʀᴛᴀɪɴᴍᴇɴᴛ*
 *━━━━━━━━━━━━━━━━━━━━━━*
-*.ᴄᴏᴍᴘʟɪᴍᴇɴᴛ @ᴜsᴇʀ
-*.ɪɴsᴜʟᴛ @ᴜsᴇʀ
-*.ғʟᴜʀᴛ*
-*.sʜɪᴘ @ᴜsᴇʀ
-*.sɪᴍᴘ @ᴜsᴇʀ
-*.ᴄʜᴀʀᴀᴄᴛᴇʀ @ᴜsᴇʀ
-*.ᴡᴀsᴛᴇᴅ @ᴜsᴇʀ
+*.ᴄᴏᴍᴘʟɪᴍᴇɴᴛ @ᴜsᴇʀ*
+*.ɪɴsᴜʟᴛ @ᴜsᴇʀ*
+*.ғʟɪʀᴛ*
+*.sʜɪᴘ @ᴜsᴇʀ*
+*.sɪᴍᴘ @ᴜsᴇʀ*
+*.ᴄʜᴀʀᴀᴄᴛᴇʀ @ᴜsᴇʀ*
+*.ᴡᴀsᴛᴇᴅ @ᴜsᴇʀ*
 *.sᴛᴜᴘɪᴅ @ᴜsᴇʀ <ᴛᴇxᴛ>*
 *.sʜᴀʏᴀʀɪ*
 *.ɢᴏᴏᴅɴɪɢʜᴛ*
@@ -180,16 +188,28 @@ async function helpCommand(sock, chatId, senderId, mentionedJids, message, args,
 *━━━━━━━━━━━━━━━━━━━━━━*
 *ᴏɴʟɪɴᴇ | sᴛᴀʙʟᴇ | ᴘʀᴏᴛᴇᴄᴛᴇᴅ*
 
-*ʙᴜɪʟᴛ & ᴘᴏᴡᴇʀᴇᴅ ʙʏ ʙᴏss ʙᴏᴛ*
-*🖼 ᴠɪsɪᴛ ᴍᴇᴅɪᴀ & ᴜᴘᴅᴀᴛᴇs*  
-*https://i.imgur.com/fRaOmQH.jpeg*`;
+*ʙᴜɪʟᴛ & ᴘᴏᴡᴇʀᴇᴅ ʙʏ ʙᴏss ʙᴏᴛ*`;
 
-    await sock.sendMessage(chatId, { text: menuText }, { quoted: message });
+    await sock.sendMessage(
+      chatId,
+      {
+        image: { url: "https://i.imgur.com/fRaOmQH.jpeg" },
+        caption: menuText,
+        ...channelInfo,
+      },
+      { quoted: message },
+    );
   } catch (err) {
-    console.error('Help error:', err);
-    await sock.sendMessage(chatId, { 
-      text: `❌ Error loading menu. View updates here: https://i.imgur.com/fRaOmQH.jpeg` 
-    }, { quoted: message });
+    console.error("Help error:", err);
+    const { channelInfo } = require("../lib/messageConfig");
+    await sock.sendMessage(
+      chatId,
+      {
+        text: `❌ Error loading menu. View updates here: https://whatsapp.com/channel/0029VbCYfhjLikgG5NQ7IN2u`,
+        ...channelInfo,
+      },
+      { quoted: message },
+    );
   }
 }
 
