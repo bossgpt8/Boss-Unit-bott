@@ -73,6 +73,7 @@ async function handleMessageRevocation(sock, msg) {
         const targetId = protocolMsg.key.id;
         
         const storage = readStorage();
+        const { channelInfo } = require("../lib/messageConfig");
         if (storage[chatId] && storage[chatId][targetId]) {
             const deletedMsg = storage[chatId][targetId];
             const sender = deletedMsg.key.participant || deletedMsg.key.remoteJid;
@@ -86,7 +87,8 @@ async function handleMessageRevocation(sock, msg) {
             
             await sock.sendMessage(chatId, {
                 text: `Nice try 😏, here is what was deleted from @${senderName}:\n\n"${content}"`,
-                mentions: [sender]
+                mentions: [sender],
+                ...channelInfo
             }, { quoted: deletedMsg });
         }
     } catch (e) {

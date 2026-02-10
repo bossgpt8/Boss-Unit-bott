@@ -69,9 +69,11 @@ ${arr.slice(6).join('')}
 `;
 
             // Send message only once to the group
+            const { channelInfo } = require("../lib/messageConfig");
             await sock.sendMessage(chatId, { 
                 text: str,
-                mentions: [room.game.currentTurn, room.game.playerX, room.game.playerO]
+                mentions: [room.game.currentTurn, room.game.playerX, room.game.playerO],
+                ...channelInfo
             });
 
         } else {
@@ -180,15 +182,18 @@ ${!winner && !isTie ? '• Type a number (1-9) to make your move\n• Type *surr
             ...(winner ? [winner] : [room.game.currentTurn])
         ];
 
+        const { channelInfo } = require("../lib/messageConfig");
         await sock.sendMessage(room.x, { 
             text: str,
-            mentions: mentions
+            mentions: mentions,
+            ...channelInfo
         });
 
         if (room.x !== room.o) {
             await sock.sendMessage(room.o, { 
                 text: str,
-                mentions: mentions
+                mentions: mentions,
+                ...channelInfo
             });
         }
 

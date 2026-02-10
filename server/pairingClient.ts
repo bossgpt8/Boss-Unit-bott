@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 
 const BOT_ID = process.env.BOT_ID;
-const PAIRING_SERVER_URL = process.env.PAIRING_SERVER_URL || "http://localhost:5000";
+const PAIRING_SERVER_URL = process.env.PAIRING_SERVER_URL || "https://boss-bot-pair.up.railway.app";
 
 if (BOT_ID) {
   const WS_URL = PAIRING_SERVER_URL.replace(/^http(s?):\/\//, "ws$1://") + `/ws?botId=${BOT_ID}`;
