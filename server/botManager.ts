@@ -168,6 +168,7 @@ export class BotManager {
             const code = await instance.sock.requestPairingCode(cleanNumber);
             if (code) {
               instance.pairingCode = code;
+              instance.status = "online"; // Set to online temporarily to show the code
               this.log(userId, "info", `Pairing code generated: ${instance.pairingCode}`);
               instance.qr = null;
             }

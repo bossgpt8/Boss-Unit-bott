@@ -153,9 +153,7 @@ export default function Home() {
                           />
                           <button
                             onClick={() => {
-                               executeAction({ action: "start", phoneNumber: phone });
-                               // Force UI to show starting state immediately
-                               window.location.reload();
+                               executeAction({ action: "start", phoneNumber: phone, userId: status?.currentUserId || undefined });
                             }}
                             disabled={isPending || !phone}
                             className="cyber-button whitespace-nowrap px-8"
