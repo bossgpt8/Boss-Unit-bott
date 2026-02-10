@@ -123,6 +123,25 @@ export default function Home() {
                         <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
                         <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">Generating Pairing Code...</p>
                         <p className="text-muted-foreground text-xs">Connecting to WhatsApp servers...</p>
+                        {botStatus === "offline" && (
+                          <div className="mt-4 w-full max-w-xs space-y-4">
+                            <Input 
+                              placeholder="234..." 
+                              value={phone}
+                              onChange={(e) => setPhone(e.target.value)}
+                              className="cyber-input"
+                            />
+                            <button
+                              onClick={() => {
+                                 executeAction({ action: "start", phoneNumber: phone, userId: status?.currentUserId || undefined });
+                              }}
+                              disabled={isPending || !phone}
+                              className="cyber-button w-full"
+                            >
+                              Connect with Phone
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : status?.pairingCode ? (
                       <div className="space-y-6">
