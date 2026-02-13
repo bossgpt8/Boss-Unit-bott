@@ -1,5 +1,4 @@
 const { storage } = require('../storage');
-
 const isOwnerOrSudo = require('../lib/isOwner');
 
 async function modeCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
@@ -21,24 +20,35 @@ async function modeCommand(sock, chatId, senderId, mentionedJids, message, args,
             } else {
                 await storage.updateSettings({ publicMode: true });
             }
+
             await sock.sendMessage(chatId, {
-                text: '🌐 *Bot Mode: PUBLIC*\n\nAnyone can now use the bot commands.\n\n> View updates here: 120363426051727952@newsletter'
+                text: '🌐 *Bot Mode: PUBLIC*\n\nAnyone can now use the bot commands.'
             }, { quoted: message });
+
         } else if (option === 'private' || option === 'priv') {
             if (userId) {
                 await storage.updateUserSettings(userId, { publicMode: false });
             } else {
                 await storage.updateSettings({ publicMode: false });
             }
+
             await sock.sendMessage(chatId, {
-                text: '🔒 *Bot Mode: PRIVATE*\n\nOnly owner and sudo users can use the bot.\n\n> View updates here: 120363426051727952@newsletter'
+                text: '🔒 *Bot Mode: PRIVATE*\n\nOnly owner and sudo users can use the bot.'
             }, { quoted: message });
+
         } else {
             const currentMode = settings.publicMode ? '🌐 Public' : '🔒 Private';
+
             await sock.sendMessage(chatId, {
-                text: `*🤖 BOT MODE*\n\nCurrent Mode: ${currentMode}\n\n*Usage:*\n• .mode public - Everyone can use\n• .mode private - Only owner can use\n\n> View updates here: 120363426051727952@newsletter`
+                text: `*🤖 BOT MODE*\n
+Current Mode: ${currentMode}
+
+*Usage:*
+• .mode public - Everyone can use
+• .mode private - Only owner can use`
             }, { quoted: message });
         }
+
     } catch (error) {
         console.error('Error in mode command:', error);
         await sock.sendMessage(chatId, { text: '❌ Failed to change mode.' }, { quoted: message });
