@@ -1,189 +1,120 @@
-import { db } from "./db";
+import { db } from "./firebase";
+import { collection, doc, getDoc, setDoc, updateDoc, query, limit, getDocs, orderBy, deleteDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import {
-  botSettings,
-  logs,
-  userSessions,
-  userSettings,
-  userLogs,
   type BotSettings,
-  type InsertBotSettings,
   type UpdateBotSettings,
   type Log,
   type UserSession,
   type InsertUserSession,
   type UpdateUserSession,
   type UserSettings,
-  type InsertUserSettings,
   type UpdateUserSettings,
   type UserLog,
 } from "../shared/schema";
-import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
-  // Global Settings
   getSettings(): Promise<BotSettings>;
   updateSettings(settings: UpdateBotSettings): Promise<BotSettings>;
-
-  // Global Logs
   addLog(level: string, message: string): Promise<Log>;
   getLogs(limit?: number): Promise<Log[]>;
   clearLogs(): Promise<void>;
-
-  // User Sessions
   createUserSession(session: InsertUserSession): Promise<UserSession>;
   getUserSession(userId: string): Promise<UserSession | null>;
   updateUserSession(userId: string, updates: UpdateUserSession): Promise<UserSession>;
   deleteUserSession(userId: string): Promise<void>;
-
-  // User Settings
   getUserSettings(userId: string): Promise<UserSettings>;
   updateUserSettings(userId: string, settings: UpdateUserSettings): Promise<UserSettings>;
-
-  // User Logs
   addUserLog(userId: string, level: string, message: string): Promise<UserLog>;
   getUserLogs(userId: string, limit?: number): Promise<UserLog[]>;
   clearUserLogs(userId: string): Promise<void>;
 }
 
-export class DatabaseStorage implements IStorage {
-  async getSettings(userId?: string): Promise<BotSettings> {
-    const query = userId ? db.select().from(botSettings).where(eq(botSettings.ownerNumber, userId)) : db.select().from(botSettings).limit(1);
-    const [settings] = await query;
-    if (!settings) {
-      // Create default settings if not exists
-      const [newSettings] = await db
-        .insert(botSettings)
-        .values({
-          botName: "Boss",
-          ownerNumber: userId || "2349164898577",
-        })
-        .returning();
-      return newSettings;
+export class FirestoreStorage implements IStorage {
+  async getSettings(): Promise<BotSettings> {
+    const docRef = doc(db, "bot_settings", "global");
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      const defaultSettings = { id: 1, botName: "Boss", ownerNumber: "2349164898577", publicMode: true, autoRead: false, welcomeEnabled: false, goodbyeEnabled: false, autoStatusRead: false, autoTyping: false };
+      await setDoc(docRef, defaultSettings);
+      return defaultSettings as any;
     }
-    return settings;
+    return docSnap.data() as any;
   }
 
   async updateSettings(updates: UpdateBotSettings): Promise<BotSettings> {
-    const current = await this.getSettings();
-    const [updated] = await db
-      .update(botSettings)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(botSettings.id, current.id))
-      .returning();
-    return updated;
+    const docRef = doc(db, "bot_settings", "global");
+    await updateDoc(docRef, { ...updates, updatedAt: serverTimestamp() });
+    return this.getSettings();
   }
 
   async addLog(level: string, message: string): Promise<Log> {
-    const [log] = await db
-      .insert(logs)
-      .values({
-        level,
-        message,
-      })
-      .returning();
-    return log;
+    const logData = { level, message, timestamp: new Date().toISOString() };
+    await addDoc(collection(db, "logs"), logData);
+    return logData as any;
   }
 
-  async getLogs(limit: number = 50): Promise<Log[]> {
-    return await db
-      .select()
-      .from(logs)
-      .orderBy(desc(logs.timestamp))
-      .limit(limit);
+  async getLogs(lim = 50): Promise<Log[]> {
+    const q = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(lim));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ ...d.data(), id: d.id })) as any;
   }
 
   async clearLogs(): Promise<void> {
-    await db.delete(logs);
+    const snap = await getDocs(collection(db, "logs"));
+    for (const d of snap.docs) await deleteDoc(d.ref);
   }
 
-  // User Sessions
   async createUserSession(session: InsertUserSession): Promise<UserSession> {
-    const [newSession] = await db
-      .insert(userSessions)
-      .values(session)
-      .returning();
-    return newSession;
+    await setDoc(doc(db, "user_sessions", session.userId), { ...session, createdAt: serverTimestamp() });
+    return session as any;
   }
 
   async getUserSession(userId: string): Promise<UserSession | null> {
-    const [session] = await db
-      .select()
-      .from(userSessions)
-      .where(eq(userSessions.userId, userId))
-      .limit(1);
-    return session || null;
+    const docSnap = await getDoc(doc(db, "user_sessions", userId));
+    return docSnap.exists() ? docSnap.data() as any : null;
   }
 
   async updateUserSession(userId: string, updates: UpdateUserSession): Promise<UserSession> {
-    const [updated] = await db
-      .update(userSessions)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(userSessions.userId, userId))
-      .returning();
-    return updated;
+    await updateDoc(doc(db, "user_sessions", userId), { ...updates, updatedAt: serverTimestamp() });
+    return this.getUserSession(userId) as any;
   }
 
   async deleteUserSession(userId: string): Promise<void> {
-    await db.delete(userSessions).where(eq(userSessions.userId, userId));
+    await deleteDoc(doc(db, "user_sessions", userId));
   }
 
-  // User Settings
   async getUserSettings(userId: string): Promise<UserSettings> {
-    const [settings] = await db
-      .select()
-      .from(userSettings)
-      .where(eq(userSettings.userId, userId))
-      .limit(1);
-
-    if (!settings) {
-      // Create default user settings
-      const [newSettings] = await db
-        .insert(userSettings)
-        .values({
-          userId,
-          botName: "Boss",
-        })
-        .returning();
-      return newSettings;
+    const docRef = doc(db, "user_settings", userId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      const defaultSet = { userId, botName: "Boss", publicMode: true };
+      await setDoc(docRef, defaultSet);
+      return defaultSet as any;
     }
-    return settings;
+    return docSnap.data() as any;
   }
 
   async updateUserSettings(userId: string, updates: UpdateUserSettings): Promise<UserSettings> {
-    const current = await this.getUserSettings(userId);
-    const [updated] = await db
-      .update(userSettings)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(userSettings.id, current.id))
-      .returning();
-    return updated;
+    await updateDoc(doc(db, "user_settings", userId), { ...updates, updatedAt: serverTimestamp() });
+    return this.getUserSettings(userId);
   }
 
-  // User Logs
   async addUserLog(userId: string, level: string, message: string): Promise<UserLog> {
-    const [log] = await db
-      .insert(userLogs)
-      .values({
-        userId,
-        level,
-        message,
-      })
-      .returning();
-    return log;
+    const log = { userId, level, message, timestamp: new Date().toISOString() };
+    await addDoc(collection(db, `user_logs_${userId}`), log);
+    return log as any;
   }
 
-  async getUserLogs(userId: string, limit: number = 50): Promise<UserLog[]> {
-    return await db
-      .select()
-      .from(userLogs)
-      .where(eq(userLogs.userId, userId))
-      .orderBy(desc(userLogs.timestamp))
-      .limit(limit);
+  async getUserLogs(userId: string, lim = 50): Promise<UserLog[]> {
+    const q = query(collection(db, `user_logs_${userId}`), orderBy("timestamp", "desc"), limit(lim));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => d.data()) as any;
   }
 
   async clearUserLogs(userId: string): Promise<void> {
-    await db.delete(userLogs).where(eq(userLogs.userId, userId));
+    const snap = await getDocs(collection(db, `user_logs_${userId}`));
+    for (const d of snap.docs) await deleteDoc(d.ref);
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new FirestoreStorage();

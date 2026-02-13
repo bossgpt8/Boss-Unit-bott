@@ -8,13 +8,11 @@ import makeWASocket, {
 } from "@whiskeysockets/baileys";
 import { Boom } from "@hapi/boom";
 import pino from "pino";
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { storage } from "./storage";
 import { handleCommand } from "./commands";
-
-// 🔴 REPLACE THIS WITH YOUR ACTUAL RAILWAY PAIRING SERVER URL
-const PAIRING_SERVER_URL = "https://boss-bot-pair.up.railway.app";
+import { uploadSession, downloadSession } from "./sessionStorage";
 
 export class BotManager {
   private instances: Map<string, {
@@ -24,13 +22,11 @@ export class BotManager {
     status: "offline" | "starting" | "online" | "error";
     reconnectAttempts: number;
   }> = new Map();
-  private maxReconnectAttempts = 10;
+  private maxReconnectAttempts = 5;
   private authDir = path.join(process.cwd(), "session");
 
   constructor() {
-    if (!fs.existsSync(this.authDir)) {
-      fs.mkdirSync(this.authDir, { recursive: true });
-    }
+    fs.ensureDirSync(this.authDir);
   }
 
   private getInstance(userId: string = "default") {
@@ -57,30 +53,7 @@ export class BotManager {
     };
   }
 
-  private async fetchSessionFromServer(sessionId: string): Promise<{ creds: any; keys: any } | null> {
-    try {
-      const res = await fetch(`${PAIRING_SERVER_URL}/session/${sessionId}/auth-state`);
-      if (!res.ok) {
-        console.warn(`[REMOTE] Session ${sessionId} not found on server (HTTP ${res.status})`);
-        return null;
-      }
-      const data = await res.json();
-      return {
-        creds: data.creds,
-        keys: data.keys,
-      };
-    } catch (e) {
-      console.error(`[REMOTE] Failed to fetch session ${sessionId}:`, e);
-      return null;
-    }
-  }
-
-  public async start(
-    phoneNumber?: string,
-    forceNewSession: boolean = true,
-    userId: string = "default",
-    useRemotePairing: boolean = false
-  ) {
+  public async start(phoneNumber?: string, forceNewSession: boolean = true, userId: string = "default") {
     const instance = this.getInstance(userId);
     if (instance.status === "online" || instance.status === "starting") return;
     
@@ -93,54 +66,25 @@ export class BotManager {
     try {
       const userAuthDir = userId === "default" ? this.authDir : path.join(this.authDir, userId);
 
-      if (forceNewSession && !useRemotePairing && phoneNumber && fs.existsSync(userAuthDir)) {
-        this.log(userId, "info", `Clearing previous LOCAL session for user ${userId}`);
-        fs.rmSync(userAuthDir, { recursive: true, force: true });
-      }
-
-      if (!fs.existsSync(userAuthDir)) {
-        fs.mkdirSync(userAuthDir, { recursive: true });
-      }
-
-      let authState;
-      let saveCreds: () => Promise<void>;
-
-      if (useRemotePairing && userId !== "default") {
-        this.log(userId, "info", `Attempting to load session from pairing server for user ${userId}`);
-        const remoteState = await this.fetchSessionFromServer(userId);
-        if (remoteState) {
-          authState = {
-            creds: remoteState.creds,
-            keys: makeCacheableSignalKeyStore(remoteState.keys, pino({ level: "silent" }) as any),
-          };
-          const { saveCreds: localSave } = await useMultiFileAuthState(userAuthDir);
-          saveCreds = localSave;
-          this.log(userId, "info", "✅ Remote session loaded successfully!");
-        } else {
-          this.log(userId, "warn", "No remote session found. Falling back to local auth.");
-          const localState = await useMultiFileAuthState(userAuthDir);
-          authState = {
-            creds: localState.state.creds,
-            keys: makeCacheableSignalKeyStore(localState.state.keys, pino({ level: "silent" }) as any),
-          };
-          saveCreds = localState.saveCreds;
-        }
+      if (forceNewSession && phoneNumber) {
+        await fs.remove(userAuthDir);
       } else {
-        const localState = await useMultiFileAuthState(userAuthDir);
-        authState = {
-          creds: localState.state.creds,
-          keys: makeCacheableSignalKeyStore(localState.state.keys, pino({ level: "silent" }) as any),
-        };
-        saveCreds = localState.saveCreds;
+        await downloadSession(userId, this.authDir);
       }
 
+      await fs.ensureDir(userAuthDir);
+
+      const { state, saveCreds } = await useMultiFileAuthState(userAuthDir);
       const { version } = await fetchLatestBaileysVersion();
 
       instance.sock = makeWASocket({
         version,
-        logger: pino({ level: "debug" }) as any,
+        logger: pino({ level: "silent" }) as any,
         printQRInTerminal: false,
-        auth: authState,
+        auth: {
+          creds: state.creds,
+          keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }) as any),
+        },
         browser: ["Ubuntu", "Chrome", "20.0.04"],
         generateHighQualityLinkPreview: true,
         msgRetryCounterCache: new Map() as any,
@@ -152,57 +96,50 @@ export class BotManager {
         retryRequestDelayMs: 5000,
       });
 
+      instance.sock.ev.on("creds.update", async () => {
+        await saveCreds();
+        await uploadSession(userId, this.authDir);
+      });
+
       const targetPhoneNumber = phoneNumber;
-      
       if (targetPhoneNumber && !instance.sock.authState.creds.registered) {
         this.log(userId, "info", `Requesting pairing code for ${targetPhoneNumber}...`);
         setTimeout(async () => {
           try {
-            if (instance.sock && !instance.sock.authState.creds.registered) {
-              this.log(userId, "info", "Generating pairing code...");
-              if (instance.sock.ws.isOpen) {
-                const code = await instance.sock.requestPairingCode(targetPhoneNumber.replace(/\D/g, ''));
-                instance.pairingCode = code?.match(/.{1,4}/g)?.join("-") || code || null;
-                this.log(userId, "info", `Pairing code generated: ${instance.pairingCode}`);
-                instance.qr = null;
-              } else {
-                this.log(userId, "error", "Socket closed before pairing code could be generated.");
-                instance.pairingCode = null;
-              }
+            if (instance.sock && !instance.sock.authState.creds.registered && instance.sock.ws.isOpen) {
+              const code = await instance.sock.requestPairingCode(targetPhoneNumber.replace(/\D/g, ''));
+              instance.pairingCode = code?.match(/.{1,4}/g)?.join("-") || code || null;
+              this.log(userId, "info", `Pairing code generated: ${instance.pairingCode}`);
+              instance.qr = null;
             }
           } catch (err) {
             this.log(userId, "error", `Failed to generate pairing code: ${err}`);
-            instance.pairingCode = null;
           }
-        }, 15000);
+        }, 10000);
       }
-
-      instance.sock.ev.on("creds.update", saveCreds);
 
       instance.sock.ev.on("connection.update", async (update: Partial<ConnectionState>) => {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr && !targetPhoneNumber) {
           instance.qr = qr;
-          this.log(userId, "info", "QR Code generated. Scan to connect.");
+          this.log(userId, "info", "QR Code generated.");
         }
 
         if (connection === "close") {
           const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
-          const errorMessage = (lastDisconnect?.error as any)?.message || 'Unknown error';
           const shouldReconnect = statusCode !== DisconnectReason.loggedOut && statusCode !== DisconnectReason.connectionReplaced;
 
-          this.log(userId, "warn", `Connection closed: ${errorMessage}, status: ${statusCode}, reconnecting: ${shouldReconnect}`);
+          this.log(userId, "warn", `Connection closed: ${statusCode}, reconnecting: ${shouldReconnect}`);
           instance.status = "offline";
           instance.qr = null;
           instance.pairingCode = null;
 
           if (shouldReconnect && instance.reconnectAttempts < this.maxReconnectAttempts) {
             instance.reconnectAttempts++;
-            const delay = Math.min(2000 * instance.reconnectAttempts, 10000);
-            setTimeout(() => this.start(undefined, false, userId, useRemotePairing), delay);
+            setTimeout(() => this.start(undefined, false, userId), 5000);
           } else if (statusCode === DisconnectReason.loggedOut) {
-            if (fs.existsSync(userAuthDir)) fs.rmSync(userAuthDir, { recursive: true, force: true });
+            await fs.remove(userAuthDir);
             instance.sock = null;
           }
         } else if (connection === "open") {
@@ -210,6 +147,17 @@ export class BotManager {
           instance.qr = null;
           instance.reconnectAttempts = 0;
           this.log(userId, "info", "Connected to WhatsApp!");
+          
+          const user = instance.sock?.user;
+          if (user) {
+            const connectedNumber = user.id.split(":")[0];
+            if (userId !== "default") {
+              await storage.updateUserSession(userId, { linkedWhatsAppNumber: connectedNumber, botActiveStatus: true });
+              await storage.updateUserSettings(userId, { ownerNumber: connectedNumber });
+            } else {
+              await storage.updateSettings({ ownerNumber: connectedNumber });
+            }
+          }
         }
       });
 
@@ -217,27 +165,7 @@ export class BotManager {
         if (m.type === "notify") {
           for (const msg of m.messages) {
             if (instance.sock) {
-              const remoteJid = msg.key.remoteJid;
-              if (!remoteJid) continue;
-              
-              const senderId = msg.key.participant || msg.key.remoteJid;
-              
-              // Handle TicTacToe Move
-              try {
-                const tictactoe = require("./commands/tictactoe.js");
-                const text = (msg.message?.conversation || 
-                             msg.message?.extendedTextMessage?.text || 
-                             msg.message?.imageMessage?.caption || 
-                             msg.message?.videoMessage?.caption || "").trim();
-                
-                if (/^\.(ttt|tictactoe)$/i.test(text)) {
-                  await tictactoe.tictactoeCommand(instance.sock, remoteJid, senderId, [], msg, [text]);
-                } else if (text && (!text.startsWith('.') || /^(surrender|give up|.surrender|.stop)$/i.test(text))) {
-                  await tictactoe.handleTicTacToeMove(instance.sock, remoteJid, senderId, [], msg, [text]);
-                }
-              } catch (e) {}
-
-              await handleCommand(instance.sock, msg, userId === "default" ? null : userId);
+              await handleCommand(instance.sock, msg, userId === "default" ? undefined : userId);
             }
           }
         }
@@ -268,7 +196,7 @@ export class BotManager {
       instance.status = "offline";
       instance.qr = null;
       const userDir = userId === "default" ? this.authDir : path.join(this.authDir, userId);
-      if (fs.existsSync(userDir)) fs.rmSync(userDir, { recursive: true, force: true });
+      await fs.remove(userDir);
       this.log(userId, "info", "Logged out and session cleared.");
     }
   }
