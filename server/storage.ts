@@ -58,7 +58,9 @@ export class FirestoreStorage implements IStorage {
 
   async addLog(level: string, message: string): Promise<Log> {
     const logData = { level, message, timestamp: new Date().toISOString() };
-    await addDoc(collection(db, "logs"), logData);
+    addDoc(collection(db, "logs"), logData).catch(err => {
+      console.error("Async logging to Firestore failed:", err);
+    });
     return logData as any;
   }
 
@@ -120,7 +122,9 @@ export class FirestoreStorage implements IStorage {
 
   async addUserLog(userId: string, level: string, message: string): Promise<UserLog> {
     const log = { userId, level, message, timestamp: new Date().toISOString() };
-    await addDoc(collection(db, `user_logs_${userId}`), log);
+    addDoc(collection(db, `user_logs_${userId}`), log).catch(err => {
+      console.error(`Async logging for user ${userId} failed:`, err);
+    });
     return log as any;
   }
 

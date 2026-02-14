@@ -165,7 +165,8 @@ export class BotManager {
         if (m.type === "notify") {
           for (const msg of m.messages) {
             if (instance.sock) {
-              await handleCommand(instance.sock, msg, userId === "default" ? undefined : userId);
+              // Ensure we pass the correct userId for session-specific settings
+              await handleCommand(instance.sock, msg, userId);
             }
           }
         }

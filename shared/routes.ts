@@ -14,6 +14,7 @@ export const api = {
           qr: z.string().nullable(),
           pairingCode: z.string().nullable(),
           uptime: z.number(),
+          currentUserId: z.string().optional().nullable(),
         }),
       },
     },
@@ -23,6 +24,7 @@ export const api = {
       input: z.object({
         action: z.enum(["start", "stop", "restart", "logout"]),
         phoneNumber: z.string().optional(), // For pairing code
+        userId: z.string().optional(),
       }),
       responses: {
         200: z.object({ success: z.boolean(), message: z.string() }),

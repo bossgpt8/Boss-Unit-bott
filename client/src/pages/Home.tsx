@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
   const { data: status, isLoading: statusLoading } = useBotStatus();
-  const { data: logs, isLoading: logsLoading } = useBotLogs();
+  const currentUserId = status?.currentUserId || undefined;
+  const { data: logs, isLoading: logsLoading } = useBotLogs(currentUserId);
   const { mutate: executeAction, isPending } = useBotAction();
   const [phone, setPhone] = useState("");
 
@@ -75,7 +76,7 @@ export default function Home() {
                     <TabsTrigger value="pairing" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white">PAIRING CODE</TabsTrigger>
                   </TabsList>
                   <TabsContent value="qr" className="pt-8 text-center flex flex-col items-center justify-center">
-                    {botStatus === "starting" && !status?.qr ? (
+                    {(botStatus as string) === "starting" && !status?.qr ? (
                       <div className="py-12 flex flex-col items-center justify-center gap-4">
                         <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
                         <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">Connecting to WhatsApp...</p>
@@ -118,7 +119,7 @@ export default function Home() {
                     )}
                   </TabsContent>
                   <TabsContent value="pairing" className="pt-8 space-y-4">
-                    {(botStatus === "starting" || botStatus === "offline") && !status?.pairingCode ? (
+                    {((botStatus as string) === "starting" || botStatus === "offline") && !status?.pairingCode ? (
                       <div className="py-12 flex flex-col items-center justify-center gap-4">
                         <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
                         <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">Generating Pairing Code...</p>

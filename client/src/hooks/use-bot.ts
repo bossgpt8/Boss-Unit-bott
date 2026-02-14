@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type Log } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase"; // Ensure this client-side firebase export exists
 
 // ============================================
 // STATUS HOOKS
@@ -15,7 +18,7 @@ export function useBotStatus() {
       const data = await res.json();
       return api.bot.status.responses[200].parse(data);
     },
-    refetchInterval: 2000, // Poll every 2 seconds
+    refetchInterval: 5000, 
   });
 }
 
@@ -28,11 +31,11 @@ export function useBotAction() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ action, phoneNumber }: { action: "start" | "stop" | "restart" | "logout", phoneNumber?: string }) => {
+    mutationFn: async ({ action, phoneNumber, userId }: { action: "start" | "stop" | "restart" | "logout", phoneNumber?: string, userId?: string }) => {
       const res = await fetch(api.bot.action.path, {
         method: api.bot.action.method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, phoneNumber }),
+        body: JSON.stringify({ action, phoneNumber, userId }),
       });
       
       if (!res.ok) {
@@ -60,17 +63,40 @@ export function useBotAction() {
 }
 
 // ============================================
-// LOGS HOOKS
+// LOGS HOOKS (Real-time Firestore Listener)
 // ============================================
 
-export function useBotLogs() {
-  return useQuery({
-    queryKey: [api.bot.logs.path],
-    queryFn: async () => {
-      const res = await fetch(api.bot.logs.path);
-      if (!res.ok) throw new Error("Failed to fetch logs");
-      return api.bot.logs.responses[200].parse(await res.json());
-    },
-    refetchInterval: 2000,
-  });
+export function useBotLogs(userId?: string) {
+  const [logs, setLogs] = useState<Log[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const colName = userId ? `user_logs_${userId}` : "logs";
+    const q = query(
+      collection(db, colName),
+      orderBy("timestamp", "desc"),
+      limit(100)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newLogs = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id as any, // Cast to avoid type mismatch with number id
+          level: data.level || "info",
+          message: data.message || "",
+          timestamp: data.timestamp ? new Date(data.timestamp) : null
+        };
+      }) as Log[];
+      setLogs(newLogs);
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Firestore real-time listener failed:", error);
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [userId]);
+
+  return { data: logs, isLoading };
 }
