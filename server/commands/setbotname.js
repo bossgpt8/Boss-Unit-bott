@@ -2,6 +2,14 @@ const { storage } = require('../storage');
 
 async function setbotnameCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     try {
+        const settings = userId ? await storage.getUserSettings(userId) : await storage.getSettings();
+        const isOwner = message.key?.fromMe || settings.ownerNumber === senderId.split('@')[0] || settings.ownerNumber === senderId.split(':')[0];
+
+        if (!isOwner) {
+            await sock.sendMessage(chatId, { text: '❌ Only bot owner can use this command!' }, { quoted: message });
+            return;
+        }
+
         if (!args || args.length === 0) {
             await sock.sendMessage(chatId, { text: "Please provide a name. Example: .setbotname MyBot" }, { quoted: message });
             return;
