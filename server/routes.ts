@@ -19,11 +19,13 @@ export async function registerRoutes(
     try {
       switch (action) {
         case "start":
-          if (!phoneNumber) {
-            return res.status(400).json({ success: false, message: "Phone number is required for pairing code." });
-          }
+          // If a phoneNumber is provided, it's a pairing code request.
+          // Otherwise, it's a QR code request.
           await botManager.start(phoneNumber, true, userId);
-          res.json({ success: true, message: "Bot starting with pairing code..." });
+          res.json({ 
+            success: true, 
+            message: phoneNumber ? "Bot starting with pairing code..." : "Bot starting for QR code generation..." 
+          });
           break;
         case "stop":
           await botManager.stop();

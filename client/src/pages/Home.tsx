@@ -14,6 +14,7 @@ export default function Home() {
   const { data: logs, isLoading: logsLoading } = useBotLogs(currentUserId);
   const { mutate: executeAction, isPending } = useBotAction();
   const [phone, setPhone] = useState("");
+  const [activeTab, setActiveTab] = useState("qr");
 
   // Defensive fallback
   const botStatus = status?.status || "offline";
@@ -37,7 +38,7 @@ export default function Home() {
           </div>
           <div className="flex gap-4">
             <button
-              onClick={() => executeAction({ action: "start" })}
+              onClick={() => executeAction({ action: "start", userId: currentUserId })}
               disabled={isPending || botStatus === "online" || botStatus === "starting"}
               className="cyber-button flex items-center justify-center gap-2 group px-8"
             >
@@ -45,7 +46,7 @@ export default function Home() {
               Initialize
             </button>
             <button
-              onClick={() => executeAction({ action: "logout" })}
+              onClick={() => executeAction({ action: "logout", userId: currentUserId })}
               disabled={isPending || !isOnline}
               className="cyber-button border-red-500/50 text-red-500 bg-red-500/10 hover:bg-red-500 hover:text-white flex items-center justify-center gap-2"
             >
@@ -70,7 +71,7 @@ export default function Home() {
                   <Smartphone className="w-5 h-5" /> 
                   LINK YOUR DEVICE
                 </h3>
-                <Tabs defaultValue="qr" className="w-full">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="grid w-full grid-cols-2 bg-black/20 border border-white/5 p-1 rounded-xl">
                     <TabsTrigger value="qr" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white">QR AUTH</TabsTrigger>
                     <TabsTrigger value="pairing" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white">PAIRING CODE</TabsTrigger>
@@ -88,7 +89,13 @@ export default function Home() {
                           <QRCode value={status.qr} size={192} level="L" />
                         </div>
                         <p className="text-xs font-bold text-primary uppercase tracking-widest">Scan with WhatsApp</p>
-                        <p className="text-[10px] text-muted-foreground">Open WhatsApp → Linked Devices → Link a Device → Scan this QR</p>
+                        <p className="text-[10px] text-muted-foreground mb-4">Open WhatsApp → Linked Devices → Link a Device → Scan this QR</p>
+                        <button 
+                          onClick={() => setActiveTab("pairing")}
+                          className="text-xs text-primary hover:underline uppercase tracking-widest font-bold"
+                        >
+                          Switch to Pairing Code
+                        </button>
                       </div>
                     ) : (
                       <div className="py-8 flex flex-col items-center gap-6">
@@ -96,50 +103,57 @@ export default function Home() {
                           <Smartphone className="w-10 h-10 text-primary/50" />
                         </div>
                         <div className="space-y-2">
-                          <p className="text-muted-foreground text-sm">Click below to generate a QR code for linking</p>
+                          <p className="text-muted-foreground text-sm">Generate a QR code to link your device</p>
                         </div>
-                        <button
-                          onClick={() => executeAction({ action: "start" })}
-                          disabled={isPending}
-                          className="cyber-button px-10 py-3 text-lg font-bold"
-                        >
-                          {isPending ? (
-                            <span className="flex items-center gap-2">
-                              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                              Connecting...
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-2">
-                              <Play className="w-5 h-5" />
-                              Generate QR Code
-                            </span>
-                          )}
-                        </button>
+                        <div className="flex flex-col items-center gap-4">
+                          <button
+                            onClick={() => executeAction({ action: "start", userId: currentUserId })}
+                            disabled={isPending}
+                            className="cyber-button px-10 py-3 text-lg font-bold"
+                          >
+                            {isPending ? "Connecting..." : "Generate QR Code"}
+                          </button>
+                          <button 
+                            onClick={() => setActiveTab("pairing")}
+                            className="text-xs text-primary hover:underline uppercase tracking-widest font-bold"
+                          >
+                            Use Pairing Code instead
+                          </button>
+                        </div>
                       </div>
                     )}
                   </TabsContent>
                   <TabsContent value="pairing" className="pt-8 space-y-4">
                     {((botStatus as string) === "starting" || botStatus === "offline") && !status?.pairingCode ? (
                       <div className="py-12 flex flex-col items-center justify-center gap-4">
-                        <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-                        <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">Generating Pairing Code...</p>
-                        <p className="text-muted-foreground text-xs">Connecting to WhatsApp servers...</p>
-                        {botStatus === "offline" && (
-                          <div className="mt-4 w-full max-w-xs space-y-4">
+                        {isPending ? (
+                          <>
+                            <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+                            <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">Generating Pairing Code...</p>
+                            <p className="text-muted-foreground text-xs">Connecting to WhatsApp servers...</p>
+                          </>
+                        ) : (
+                          <div className="w-full max-w-xs space-y-4 mx-auto">
                             <Input 
-                              placeholder="234..." 
+                              placeholder="Phone Number (e.g. 234...)" 
                               value={phone}
                               onChange={(e) => setPhone(e.target.value)}
                               className="cyber-input"
                             />
                             <button
                               onClick={() => {
-                                 executeAction({ action: "start", phoneNumber: phone, userId: status?.currentUserId || undefined });
+                                 executeAction({ action: "start", phoneNumber: phone, userId: currentUserId });
                               }}
                               disabled={isPending || !phone}
                               className="cyber-button w-full"
                             >
                               Connect with Phone
+                            </button>
+                            <button 
+                              onClick={() => setActiveTab("qr")}
+                              className="text-xs text-primary hover:underline uppercase tracking-widest font-bold block w-full text-center"
+                            >
+                              Use QR Code instead
                             </button>
                           </div>
                         )}
@@ -159,38 +173,15 @@ export default function Home() {
                             <li className="flex gap-2"><span className="text-primary font-bold">4.</span> Tap "Link with phone number instead"</li>
                             <li className="flex gap-2"><span className="text-primary font-bold">5.</span> Enter the code shown above</li>
                           </ol>
-                          <p className="text-[10px] text-yellow-500 mt-4 font-medium">Code expires in ~60 seconds. Generate a new one if it fails.</p>
                         </div>
+                        <button 
+                          onClick={() => setActiveTab("qr")}
+                          className="text-xs text-primary hover:underline uppercase tracking-widest font-bold block w-full text-center"
+                        >
+                          Switch to QR Code
+                        </button>
                       </div>
-                    ) : (
-                      <>
-                        <div className="flex gap-3">
-                          <Input 
-                            placeholder="234..." 
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="cyber-input flex-1"
-                          />
-                          <button
-                            onClick={() => {
-                               executeAction({ action: "start", phoneNumber: phone, userId: status?.currentUserId || undefined });
-                            }}
-                            disabled={isPending || !phone}
-                            className="cyber-button whitespace-nowrap px-8"
-                          >
-                            {isPending ? (
-                              <span className="flex items-center gap-2">
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                Connecting...
-                              </span>
-                            ) : (
-                              "Generate Code"
-                            )}
-                          </button>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground italic font-medium uppercase tracking-wider">Format: country code + number (e.g. 2349015613510)</p>
-                      </>
-                    )}
+                    ) : null}
                   </TabsContent>
                 </Tabs>
               </div>

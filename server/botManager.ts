@@ -42,7 +42,7 @@ export class BotManager {
     return this.instances.get(userId)!;
   }
 
-  public getStatus(userId: string = "default") {
+  public getStatus(userId: string = "default"): any {
     const instance = this.getInstance(userId);
     return {
       status: instance.status,
@@ -50,7 +50,7 @@ export class BotManager {
       pairingCode: instance.pairingCode,
       uptime: process.uptime(),
       currentUserId: userId === "default" ? null : userId,
-    } as any;
+    };
   }
 
   public async start(phoneNumber?: string, forceNewSession: boolean = true, userId: string = "default") {
