@@ -71,8 +71,12 @@ export async function handleCommand(sock: WASocket, msg: proto.IWebMessageInfo, 
     if (isFromMe) return;
     try {
       const chatbotModule = require("./commands/chatbot.js");
-      if (chatbotModule?.handleChatbotResponse) await chatbotModule.handleChatbotResponse(sock, remoteJid, msg, content, sender);
-    } catch (e) {}
+      if (chatbotModule?.handleChatbotResponse) {
+        await chatbotModule.handleChatbotResponse(sock, remoteJid, msg, content, sender);
+      }
+    } catch (e) {
+      console.error("Chatbot error:", e);
+    }
     return;
   }
 

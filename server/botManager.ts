@@ -71,7 +71,8 @@ export class BotManager {
 
     for (const logMsg of bootLogs) {
       this.log(userId, "info", logMsg);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Wait a bit to simulate the sequence
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     try {

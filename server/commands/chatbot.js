@@ -67,13 +67,12 @@ async function handleChatbotCommand(sock, chatId, senderId, mentionedJids, messa
     }
 
     const isOwnerOrSudo = require('../lib/isOwner');
-    // In multi-user mode, we will update this to check Firestore
     const isOwner = await isOwnerOrSudo(senderId, sock, chatId);
     
-    // For now, ensure the check is dynamic
-    const botId = sock.user.id.split(':')[0];
+    // In multi-user mode, use currentUserId for owner check
+    const currentUserId = sock.user.id.split(':')[0];
     const senderNumber = senderId.split('@')[0].split(':')[0];
-    const isBotOwner = (senderNumber === botId) || isOwner;
+    const isBotOwner = (senderNumber === currentUserId) || isOwner;
     
     let isAdmin = false;
     if (chatId.endsWith('@g.us')) {
