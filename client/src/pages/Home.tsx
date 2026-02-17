@@ -7,18 +7,24 @@ import QRCode from "react-qr-code";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 
 export default function Home() {
+  const { user } = useFirebaseAuth();
+  const isAdmin = user?.email === "osanisrael2@gmail.com";
+  
   const { data: status, isLoading: statusLoading } = useBotStatus();
   const currentUserId = status?.currentUserId || undefined;
   const { data: logs, isLoading: logsLoading } = useBotLogs(currentUserId);
   const { mutate: executeAction, isPending } = useBotAction();
   const [phone, setPhone] = useState("");
-  const [activeTab, setActiveTab] = useState("qr");
+  const [activeTab, setActiveTab] = useState("pairing"); // Default to pairing
 
   // Defensive fallback
   const botStatus = status?.status || "offline";
   const isOnline = botStatus === "online";
+  const isStarting = botStatus === "starting";
+  const linkedNumber = status?.linkedWhatsAppNumber || (status as any)?.ownerNumber;
 
   return (
     <CyberLayout>
@@ -59,131 +65,84 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <StatusCard 
-              status={botStatus} 
-              qr={status?.qr || null} 
+              status={isOnline ? "online" : botStatus} 
+              qr={null} 
               pairingCode={status?.pairingCode || null}
               uptime={status?.uptime || 0} 
             />
             
-            {!isOnline && botStatus !== "starting" && (
+            {isOnline && linkedNumber && (
+              <div className="cyber-card p-4 border-green-500/20 bg-green-500/5 text-center">
+                <p className="text-green-500 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Linked: +{linkedNumber}
+                </p>
+              </div>
+            )}
+
+            {!isOnline && !isStarting && (
               <div className="cyber-card p-6 border-primary/20 bg-primary/5">
                 <h3 className="text-xl mb-6 text-primary flex items-center gap-2 font-display font-bold">
                   <Smartphone className="w-5 h-5" /> 
                   LINK YOUR DEVICE
                 </h3>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 bg-black/20 border border-white/5 p-1 rounded-xl">
-                    <TabsTrigger value="qr" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white">QR AUTH</TabsTrigger>
-                    <TabsTrigger value="pairing" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white">PAIRING CODE</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-1 bg-black/20 border border-white/5 p-1 rounded-xl">
+                    <TabsTrigger value="pairing" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white uppercase tracking-widest font-bold">Pairing Code</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="qr" className="pt-8 text-center flex flex-col items-center justify-center">
-                    {(botStatus as string) === "starting" && !status?.qr ? (
-                      <div className="py-12 flex flex-col items-center justify-center gap-4">
-                        <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-                        <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">Connecting to WhatsApp...</p>
-                        <p className="text-muted-foreground text-xs">This may take 10-15 seconds</p>
-                      </div>
-                    ) : status?.qr ? (
-                      <div className="flex flex-col items-center gap-4">
-                        <div className="bg-white p-4 rounded-xl shadow-2xl shadow-primary/20">
-                          <QRCode value={status.qr} size={192} level="L" />
+                  
+                  <TabsContent value="pairing" className="pt-8 space-y-4">
+                    <div className="bg-black/40 border border-white/10 rounded-xl p-4 mb-6">
+                      <p className="text-xs font-bold text-primary uppercase tracking-wider mb-3">Instructions:</p>
+                      <ul className="space-y-2 text-xs text-muted-foreground">
+                        <li>• Enter your phone number with country code (e.g., 23480...)</li>
+                        <li>• Click "Connect" and wait for the 8-digit code</li>
+                        <li>• Open WhatsApp {" > "} Linked Devices {" > "} Link with phone number instead</li>
+                      </ul>
+                    </div>
+
+                    {!status?.pairingCode ? (
+                      <div className="py-4 flex flex-col items-center justify-center gap-4">
+                        <div className="w-full max-w-xs space-y-4 mx-auto">
+                          <Input 
+                            placeholder="Phone Number (e.g. 234...)" 
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className="cyber-input"
+                          />
+                          <button
+                            onClick={() => {
+                               executeAction({ action: "start", phoneNumber: phone, userId: currentUserId });
+                            }}
+                            disabled={isPending || !phone}
+                            className="cyber-button w-full"
+                          >
+                            Connect
+                          </button>
                         </div>
-                        <p className="text-xs font-bold text-primary uppercase tracking-widest">Scan with WhatsApp</p>
-                        <p className="text-[10px] text-muted-foreground mb-4">Open WhatsApp → Linked Devices → Link a Device → Scan this QR</p>
-                        <button 
-                          onClick={() => setActiveTab("pairing")}
-                          className="text-xs text-primary hover:underline uppercase tracking-widest font-bold"
-                        >
-                          Switch to Pairing Code
-                        </button>
                       </div>
                     ) : (
-                      <div className="py-8 flex flex-col items-center gap-6">
-                        <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center border-2 border-dashed border-primary/30">
-                          <Smartphone className="w-10 h-10 text-primary/50" />
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-muted-foreground text-sm">Generate a QR code to link your device</p>
-                        </div>
-                        <div className="flex flex-col items-center gap-4">
-                          <button
-                            onClick={() => executeAction({ action: "start", userId: currentUserId })}
-                            disabled={isPending}
-                            className="cyber-button px-10 py-3 text-lg font-bold"
-                          >
-                            {isPending ? "Connecting..." : "Generate QR Code"}
-                          </button>
-                          <button 
-                            onClick={() => setActiveTab("pairing")}
-                            className="text-xs text-primary hover:underline uppercase tracking-widest font-bold"
-                          >
-                            Use Pairing Code instead
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </TabsContent>
-                  <TabsContent value="pairing" className="pt-8 space-y-4">
-                    {((botStatus as string) === "starting" || botStatus === "offline") && !status?.pairingCode ? (
-                      <div className="py-12 flex flex-col items-center justify-center gap-4">
-                        {isPending ? (
-                          <>
-                            <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-                            <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">Generating Pairing Code...</p>
-                            <p className="text-muted-foreground text-xs">Connecting to WhatsApp servers...</p>
-                          </>
-                        ) : (
-                          <div className="w-full max-w-xs space-y-4 mx-auto">
-                            <Input 
-                              placeholder="Phone Number (e.g. 234...)" 
-                              value={phone}
-                              onChange={(e) => setPhone(e.target.value)}
-                              className="cyber-input"
-                            />
-                            <button
-                              onClick={() => {
-                                 executeAction({ action: "start", phoneNumber: phone, userId: currentUserId });
-                              }}
-                              disabled={isPending || !phone}
-                              className="cyber-button w-full"
-                            >
-                              Connect with Phone
-                            </button>
-                            <button 
-                              onClick={() => setActiveTab("qr")}
-                              className="text-xs text-primary hover:underline uppercase tracking-widest font-bold block w-full text-center"
-                            >
-                              Use QR Code instead
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ) : status?.pairingCode ? (
                       <div className="space-y-6">
                         <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 text-center">
                           <p className="text-muted-foreground text-xs uppercase tracking-widest mb-2 font-bold">Your Pairing Code</p>
                           <p className="text-4xl font-display font-bold text-primary tracking-[0.3em]">{status.pairingCode}</p>
                         </div>
-                        <div className="bg-black/40 border border-white/10 rounded-xl p-4">
-                          <p className="text-xs font-bold text-primary uppercase tracking-wider mb-3">How to Link:</p>
-                          <ol className="space-y-2 text-sm text-muted-foreground">
-                            <li className="flex gap-2"><span className="text-primary font-bold">1.</span> Open WhatsApp on your phone</li>
-                            <li className="flex gap-2"><span className="text-primary font-bold">2.</span> Go to Settings → Linked Devices</li>
-                            <li className="flex gap-2"><span className="text-primary font-bold">3.</span> Tap "Link a Device"</li>
-                            <li className="flex gap-2"><span className="text-primary font-bold">4.</span> Tap "Link with phone number instead"</li>
-                            <li className="flex gap-2"><span className="text-primary font-bold">5.</span> Enter the code shown above</li>
-                          </ol>
-                        </div>
-                        <button 
-                          onClick={() => setActiveTab("qr")}
-                          className="text-xs text-primary hover:underline uppercase tracking-widest font-bold block w-full text-center"
-                        >
-                          Switch to QR Code
-                        </button>
                       </div>
-                    ) : null}
+                    )}
                   </TabsContent>
                 </Tabs>
+              </div>
+            )}
+
+            {isStarting && (
+              <div className="cyber-card p-12 flex flex-col items-center justify-center gap-6 border-primary/20 bg-primary/5">
+                <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+                <div className="text-center space-y-2">
+                  <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">Initializing System...</p>
+                  <p className="text-muted-foreground text-xs font-mono">
+                    {logs?.findLast(l => l.level === "info")?.message || "Preparing sequence..."}
+                  </p>
+                </div>
               </div>
             )}
 
@@ -223,31 +182,33 @@ export default function Home() {
             </div>
           </div>
           <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  Live Command Stream
-                </h3>
-                <button
-                  onClick={async () => {
-                    try {
-                      await fetch("/api/bot/logs", { method: "DELETE" });
-                      window.location.reload();
-                    } catch (e) {
-                      console.error("Failed to clear logs", e);
-                    }
-                  }}
-                  className="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase tracking-widest flex items-center gap-1"
-                >
-                  <Trash2 className="w-3 h-3" />
-                  Clear Logs
-                </button>
+            {isAdmin && (
+              <div className="sticky top-24">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    Live Command Stream
+                  </h3>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await fetch("/api/bot/logs", { method: "DELETE" });
+                        window.location.reload();
+                      } catch (e) {
+                        console.error("Failed to clear logs", e);
+                      }
+                    }}
+                    className="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase tracking-widest flex items-center gap-1"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Clear Logs
+                  </button>
+                </div>
+                <div className="rounded-2xl overflow-hidden border border-white/5">
+                  <Terminal logs={logs} isLoading={logsLoading} />
+                </div>
               </div>
-              <div className="rounded-2xl overflow-hidden border border-white/5">
-                <Terminal logs={logs} isLoading={logsLoading} />
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

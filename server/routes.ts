@@ -23,12 +23,11 @@ export async function registerRoutes(
     try {
       switch (action) {
         case "start":
-          // If a phoneNumber is provided, it's a pairing code request.
-          // Otherwise, it's a QR code request.
-          await botManager.start(phoneNumber, true, userId);
+          // Start the bot process - logs will be handled internally with delays
+          botManager.start(phoneNumber, true, userId);
           res.json({ 
             success: true, 
-            message: phoneNumber ? "Bot starting with pairing code..." : "Bot starting for QR code generation..." 
+            message: "Initialization sequence started..." 
           });
           break;
         case "stop":

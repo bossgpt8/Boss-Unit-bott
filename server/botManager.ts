@@ -122,9 +122,10 @@ export class BotManager {
         await uploadSession(userId, this.authDir);
       });
 
+      // Pairing code logic
       if (!instance.sock.authState.creds.registered) {
         if (phoneNumber) {
-          this.log(userId, "info", `Requesting pairing code for ${phoneNumber}...`);
+          // No log here to avoid premature linking message
           setTimeout(async () => {
             try {
               if (instance.sock && !instance.sock.authState.creds.registered && instance.sock.ws.isOpen) {
