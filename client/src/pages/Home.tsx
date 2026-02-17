@@ -24,7 +24,7 @@ export default function Home() {
   const botStatus = status?.status || "offline";
   const isOnline = botStatus === "online";
   const isStarting = botStatus === "starting";
-  const linkedNumber = status?.linkedWhatsAppNumber || (status as any)?.ownerNumber;
+  const linkedNumber = (status as any)?.linkedWhatsAppNumber || (status as any)?.ownerNumber;
 
   return (
     <CyberLayout>
