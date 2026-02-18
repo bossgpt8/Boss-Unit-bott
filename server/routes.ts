@@ -51,11 +51,26 @@ export async function registerRoutes(
     }
   });
 
-  // Logs
+  // Logs SSE Stream
+  app.get("/api/bot/logs/stream", (req, res) => {
+    const userId = (req.query.userId as string) || "default";
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
+
+    const unsubscribe = botManager.subscribeLogs(userId, (log) => {
+      res.write(`data: ${JSON.stringify(log)}\n\n`);
+    });
+
+    req.on("close", () => {
+      unsubscribe();
+    });
+  });
+
+  // Logs (Legacy endpoint - returns empty as we don't persist)
   app.get(api.bot.logs.path, async (req, res) => {
-    const userId = req.query.userId as string;
-    const logs = userId ? await storage.getUserLogs(userId) : await storage.getLogs();
-    res.json(logs);
+    res.json([]);
   });
 
   // Clear Logs

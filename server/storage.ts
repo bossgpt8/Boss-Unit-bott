@@ -58,21 +58,18 @@ export class FirestoreStorage implements IStorage {
 
   async addLog(level: string, message: string): Promise<Log> {
     const logData = { level, message, timestamp: new Date().toISOString() };
-    addDoc(collection(db, "logs"), logData).catch(err => {
-      console.error("Async logging to Firestore failed:", err);
-    });
+    // Console only, no Firestore persistence for bot logs
+    console.log(`[BOT LOG] [${level.toUpperCase()}] ${message}`);
     return logData as any;
   }
 
   async getLogs(lim = 50): Promise<Log[]> {
-    const q = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(lim));
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({ ...d.data(), id: d.id })) as any;
+    // Return empty as we don't persist logs to Firestore anymore
+    return [];
   }
 
   async clearLogs(): Promise<void> {
-    const snap = await getDocs(collection(db, "logs"));
-    for (const d of snap.docs) await deleteDoc(d.ref);
+    // No-op
   }
 
   async createUserSession(session: InsertUserSession): Promise<UserSession> {
@@ -122,21 +119,18 @@ export class FirestoreStorage implements IStorage {
 
   async addUserLog(userId: string, level: string, message: string): Promise<UserLog> {
     const log = { userId, level, message, timestamp: new Date().toISOString() };
-    addDoc(collection(db, `user_logs_${userId}`), log).catch(err => {
-      console.error(`Async logging for user ${userId} failed:`, err);
-    });
+    // Console only, no Firestore persistence for bot logs
+    console.log(`[USER LOG] [${userId}] [${level.toUpperCase()}] ${message}`);
     return log as any;
   }
 
   async getUserLogs(userId: string, lim = 50): Promise<UserLog[]> {
-    const q = query(collection(db, `user_logs_${userId}`), orderBy("timestamp", "desc"), limit(lim));
-    const snap = await getDocs(q);
-    return snap.docs.map(d => d.data()) as any;
+    // Return empty as we don't persist logs to Firestore anymore
+    return [];
   }
 
   async clearUserLogs(userId: string): Promise<void> {
-    const snap = await getDocs(collection(db, `user_logs_${userId}`));
-    for (const d of snap.docs) await deleteDoc(d.ref);
+    // No-op
   }
 }
 
