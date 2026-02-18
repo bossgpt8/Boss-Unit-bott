@@ -2,8 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type Log } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
-import { db } from "@/lib/firebase"; // Ensure this client-side firebase export exists
 
 // ============================================
 // STATUS HOOKS
@@ -63,7 +61,7 @@ export function useBotAction() {
 }
 
 // ============================================
-// LOGS HOOKS (Real-time Firestore Listener)
+// LOGS HOOKS (SSE Implementation)
 // ============================================
 
 export function useBotLogs(userId?: string) {
@@ -71,31 +69,27 @@ export function useBotLogs(userId?: string) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const colName = userId ? `user_logs_${userId}` : "logs";
-    const q = query(
-      collection(db, colName),
-      orderBy("timestamp", "desc"),
-      limit(100)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newLogs = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id as any, // Cast to avoid type mismatch with number id
-          level: data.level || "info",
-          message: data.message || "",
-          timestamp: data.timestamp ? new Date(data.timestamp) : null
-        };
-      }) as Log[];
-      setLogs(newLogs);
+    const eventSource = new EventSource(`/api/bot/logs/stream?userId=${userId || "default"}`);
+    
+    eventSource.onmessage = (event) => {
+      const newLog = JSON.parse(event.data);
+      setLogs((prev) => [{
+        ...newLog,
+        id: Math.random(), // Temporary ID for list rendering
+        timestamp: new Date(newLog.timestamp)
+      }, ...prev].slice(0, 100));
       setIsLoading(false);
-    }, (error) => {
-      console.error("Firestore real-time listener failed:", error);
-      setIsLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    eventSource.onerror = (err) => {
+      console.error("SSE Error:", err);
+      eventSource.close();
+      setIsLoading(false);
+    };
+
+    return () => {
+      eventSource.close();
+    };
   }, [userId]);
 
   return { data: logs, isLoading };
