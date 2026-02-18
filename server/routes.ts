@@ -19,15 +19,15 @@ export async function registerRoutes(
 
   // Bot Actions
   app.post(api.bot.action.path, async (req, res) => {
-    const { action, phoneNumber, userId } = req.body;
+    const { action, phoneNumber, userId, forceNewSession } = req.body;
     try {
       switch (action) {
         case "start":
           // Start the bot process - logs will be handled internally with delays
-          botManager.start(phoneNumber, true, userId);
+          botManager.start(phoneNumber, forceNewSession !== undefined ? forceNewSession : true, userId);
           res.json({ 
             success: true, 
-            message: "Initialization sequence started..." 
+            message: "System sequence started..." 
           });
           break;
         case "stop":

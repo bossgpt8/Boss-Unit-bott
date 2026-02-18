@@ -61,26 +61,16 @@ export class BotManager {
     instance.pairingCode = null;
     instance.qr = null;
     
-    const bootLogs = [
-      "Initializing...",
-      "Initialized",
-      "Starting bot...",
-      "Bot started",
-      "Checking session..."
-    ];
-
-    for (const logMsg of bootLogs) {
-      this.log(userId, "info", logMsg);
-      // Wait a bit to simulate the sequence
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
     try {
       const userAuthDir = userId === "default" ? this.authDir : path.join(this.authDir, userId);
       let sessionExists = false;
 
+      // Always try to download session first if not forcing a new one
       if (!forceNewSession) {
         sessionExists = await downloadSession(userId, this.authDir);
+      } else {
+        // Even if forceNewSession is true, if we have a local creds.json, it might be a reboot
+        sessionExists = await fs.pathExists(path.join(userAuthDir, 'creds.json'));
       }
 
       if (sessionExists) {

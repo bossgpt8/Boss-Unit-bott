@@ -206,9 +206,8 @@ async function handleChatbotResponse(sock, chatId, message, userMessage, senderI
             addToConversation(senderId, 'assistant', response);
             await sock.sendMessage(chatId, { text: response }, { quoted: message });
         } else {
-            await sock.sendMessage(chatId, { 
-                text: "hmm, I'm having a bit of trouble thinking rn 😅 try again in a sec?" 
-            }, { quoted: message });
+            // No error message for user, just log it internally
+            console.error('AI failed to respond for', senderId);
         }
     } catch (error) {
         console.error('Error in chatbot response:', error.message);
@@ -247,9 +246,10 @@ Examples of good responses:
     // Try OpenRouter first
     if (OPENROUTER_API_KEY) {
         const models = [
+            'google/gemini-2.0-flash-exp:free',
+            'google/gemini-2.0-flash-thinking-exp:free',
             'qwen/qwen-2.5-72b-instruct',
-            'meta-llama/llama-3.1-405b-instruct',
-            'qwen/qwen-2.5-7b-instruct'
+            'meta-llama/llama-3.1-405b-instruct'
         ];
         
         for (const model of models) {

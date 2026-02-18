@@ -44,7 +44,7 @@ export default function Home() {
           </div>
           <div className="flex gap-4">
             <button
-              onClick={() => executeAction({ action: "start", userId: currentUserId })}
+              onClick={() => executeAction({ action: "start", userId: currentUserId, forceNewSession: false })}
               disabled={isPending || botStatus === "online" || botStatus === "starting"}
               className="cyber-button flex items-center justify-center gap-2 group px-8"
             >
@@ -138,10 +138,7 @@ export default function Home() {
               <div className="cyber-card p-12 flex flex-col items-center justify-center gap-6 border-primary/20 bg-primary/5">
                 <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
                 <div className="text-center space-y-2">
-                  <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">Initializing System...</p>
-                  <p className="text-muted-foreground text-xs font-mono">
-                    {logs?.findLast(l => l.level === "info")?.message || "Preparing sequence..."}
-                  </p>
+                  <p className="text-primary text-sm font-bold uppercase tracking-widest animate-pulse">System Starting...</p>
                 </div>
               </div>
             )}

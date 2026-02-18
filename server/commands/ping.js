@@ -50,14 +50,6 @@ async function pingCommand(
         chatId,
         {
             text: botInfo,
-            contextInfo: {
-                ...channelInfo.contextInfo,
-                externalAdReply: {
-                    ...channelInfo.contextInfo.externalAdReply,
-                    thumbnailUrl: BOT_IMAGE,
-                    renderLargerThumbnail: true
-                }
-            },
             buttons: channelInfo.buttons,
             footer: channelInfo.footer,
             headerType: 4
