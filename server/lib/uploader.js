@@ -107,4 +107,4 @@ const { ext } = await fromBuffer(medianya) || options.ext
         return jsonnya
 }
 
-module.exports = { TelegraPh, UploadFileUgu, webp2mp4File, floNime }
+export default { TelegraPh, UploadFileUgu, webp2mp4File, floNime }

@@ -12,4 +12,4 @@ async function clearCommand(sock, chatId) {
     }
 }
 
-module.exports = { clearCommand };
+export default { clearCommand };

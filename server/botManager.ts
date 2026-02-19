@@ -65,11 +65,9 @@ export class BotManager {
       const userAuthDir = userId === "default" ? this.authDir : path.join(this.authDir, userId);
       let sessionExists = false;
 
-      // Always try to download session first if not forcing a new one
       if (!forceNewSession) {
         sessionExists = await downloadSession(userId, this.authDir);
       } else {
-        // Even if forceNewSession is true, if we have a local creds.json, it might be a reboot
         sessionExists = await fs.pathExists(path.join(userAuthDir, 'creds.json'));
       }
 
@@ -112,10 +110,8 @@ export class BotManager {
         await uploadSession(userId, this.authDir);
       });
 
-      // Pairing code logic
       if (!instance.sock.authState.creds.registered) {
         if (phoneNumber) {
-          // No log here to avoid premature linking message
           setTimeout(async () => {
             try {
               if (instance.sock && !instance.sock.authState.creds.registered && instance.sock.ws.isOpen) {
@@ -174,15 +170,15 @@ export class BotManager {
           for (const msg of m.messages) {
             if (instance.sock) {
               try {
-                // Handle Anti-Delete
-                const { storeMessage, handleMessageRevocation } = require('./commands/antidelete');
+                const antideleteModule = await import('./commands/antidelete.js');
+                const antidelete = antideleteModule.default || antideleteModule;
+                
                 if (msg.message?.protocolMessage) {
-                  await handleMessageRevocation(instance.sock, msg);
+                  await antidelete.handleMessageRevocation(instance.sock, msg);
                 } else {
-                  await storeMessage(instance.sock, msg);
+                  await antidelete.storeMessage(instance.sock, msg);
                 }
 
-                // Ensure we pass the correct userId for session-specific settings
                 await handleCommand(instance.sock, msg, userId);
               } catch (cmdErr) {
                 this.log(userId, "error", `Command handling error: ${cmdErr}`);
@@ -238,13 +234,10 @@ export class BotManager {
     const logData = { level, message, timestamp: new Date().toISOString(), userId };
     console.log(`[${userId.toUpperCase()}] [${level.toUpperCase()}] ${message}`);
     
-    // Stream to memory listeners (SSE) for real-time dashboard updates
     const listeners = this.logListeners.get(userId);
     if (listeners) {
       listeners.forEach(listener => listener(logData));
     }
-
-    // Per user request: DO NOT save logs to Firestore to maintain speed
   }
 }
 

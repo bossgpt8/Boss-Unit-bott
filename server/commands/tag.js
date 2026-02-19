@@ -1,7 +1,7 @@
-const isAdmin = require('../lib/isAdmin');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
-const fs = require('fs');
-const path = require('path');
+import isAdmin from '../lib/isAdmin.js';
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+import fs from 'fs';
+import path from 'path';
 
 async function downloadMediaMessage(message, mediaType) {
     const stream = await downloadContentFromMessage(message, mediaType);
@@ -85,4 +85,4 @@ async function tagCommand(sock, chatId, senderId, messageText, replyMessage, mes
     }
 }
 
-module.exports = tagCommand;
+export default tagCommand;

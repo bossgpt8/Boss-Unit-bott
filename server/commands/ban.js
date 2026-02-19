@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const isAdmin = require('../lib/isAdmin');
+import fs from 'fs';
+import path from 'path';
+import isAdmin from '../lib/isAdmin.js';
 
 async function banCommand(sock, chatId, senderId, mentionedJids, message, args, quotedParticipant) {
     const isGroup = chatId.endsWith('@g.us');
@@ -37,4 +37,4 @@ async function banCommand(sock, chatId, senderId, mentionedJids, message, args, 
     }
 }
 
-module.exports = banCommand;
+export default banCommand;

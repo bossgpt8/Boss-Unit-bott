@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 async function dareCommand(sock, chatId, message) {
     try {
@@ -74,4 +74,4 @@ async function dareCommand(sock, chatId, message) {
     }
 }
 
-module.exports = { dareCommand };
+export default { dareCommand };

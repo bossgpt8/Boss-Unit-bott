@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const isOwnerOrSudo = require('../lib/isOwner');
+import fs from 'fs';
+import path from 'path';
+import isOwnerOrSudo from '../lib/isOwner.js';
 
 const PMBLOCKER_PATH = path.join(__dirname, '..', 'data', 'pmblocker.json');
 
@@ -75,7 +75,7 @@ async function pmblockerCommand(sock, chatId, senderId, mentionedJids, message, 
     await sock.sendMessage(chatId, { text: `✅ PM Blocker is now *${enable ? 'ENABLED' : 'DISABLED'}*.${enable ? '\n\nNon-owners will receive a warning when they DM the bot.' : ''}` }, { quoted: message });
 }
 
-module.exports = { 
+export default { 
     execute: pmblockerCommand,
     pmblockerCommand, 
     readState 

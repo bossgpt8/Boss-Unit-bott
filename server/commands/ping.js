@@ -1,4 +1,4 @@
-const settings = require("../settings.js");
+import settings from '../settings.js';
 
 // You can replace with your Imgur direct link if needed
 const BOT_IMAGE = "https://i.imgur.com/fRaOmQH.jpeg";
@@ -36,8 +36,8 @@ async function pingCommand(
         const uptimeInSeconds = process.uptime();
         const uptimeFormatted = formatTime(uptimeInSeconds);
 
-    const { channelInfo } = require("../lib/messageConfig");
-    const settingsData = await require("../storage").storage.getSettings();
+    import { channelInfo } from '../lib/messageConfig.js';
+    const settingsData = await import("../storage.js").storage.getSettings();
     const botInfo = `⚔️ *ʙᴏss ᴜɴɪᴛ sᴛᴀᴛᴜs* ⚔️
 
 🚀 *ʟᴀᴛᴇɴᴄʏ  : ${ping} ms*
@@ -66,4 +66,4 @@ async function pingCommand(
     }
 }
 
-module.exports = pingCommand;
+export default pingCommand;

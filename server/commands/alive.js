@@ -1,6 +1,6 @@
-const settings = require("../settings");
-const fs = require("fs");
-const path = require("path");
+import settings from '../settings.js';
+import fs from 'fs';
+import path from 'path';
 
 // Your Imgur direct link
 const BOT_IMAGE = "https://i.imgur.com/fRaOmQH.jpeg";
@@ -37,8 +37,8 @@ async function aliveCommand(
         } catch (e) {}
 
         // Send as clickable link preview with channel info
-        const { channelInfo } = require("../lib/messageConfig");
-        const settingsData = await require("../storage").storage.getSettings();
+        import { channelInfo } from '../lib/messageConfig.js';
+        const settingsData = await import("../storage.js").storage.getSettings();
         
         await sock.sendMessage(
             chatId,
@@ -80,4 +80,4 @@ Type *.menu* to access all features.
     }
 }
 
-module.exports = aliveCommand;
+export default aliveCommand;

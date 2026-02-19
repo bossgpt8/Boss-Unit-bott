@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const isOwnerOrSudo = require('../lib/isOwner');
+import fs from 'fs';
+import path from 'path';
+import isOwnerOrSudo from '../lib/isOwner.js';
 
 const ANTICALL_PATH = path.join(__dirname, '..', 'data', 'anticall.json');
 
@@ -55,7 +55,7 @@ async function anticallCommand(sock, chatId, senderId, mentionedJids, message, a
     await sock.sendMessage(chatId, { text: `✅ Anticall is now *${enable ? 'ENABLED' : 'DISABLED'}*.${enable ? '\n\nAll incoming calls will be automatically rejected.' : ''}` }, { quoted: message });
 }
 
-module.exports = { 
+export default { 
     execute: anticallCommand,
     anticallCommand, 
     readState 

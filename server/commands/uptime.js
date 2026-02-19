@@ -42,4 +42,4 @@ async function uptimeCommand(
     }
 }
 
-module.exports = uptimeCommand;
+export default uptimeCommand;

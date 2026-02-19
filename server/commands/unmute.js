@@ -1,4 +1,4 @@
-const isAdmin = require('../lib/isAdmin');
+import isAdmin from '../lib/isAdmin.js';
 
 async function unmuteCommand(sock, chatId, senderId, mentionedJids, message) {
     if (!chatId.endsWith('@g.us')) return;
@@ -11,4 +11,4 @@ async function unmuteCommand(sock, chatId, senderId, mentionedJids, message) {
     await sock.sendMessage(chatId, { text: 'The group has been unmuted.' }, { quoted: message });
 }
 
-module.exports = unmuteCommand;
+export default unmuteCommand;

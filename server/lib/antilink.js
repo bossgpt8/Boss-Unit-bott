@@ -1,7 +1,7 @@
 const { isJidGroup } = require('@whiskeysockets/baileys');
 const { getAntilink, incrementWarningCount, resetWarningCount, isSudo } = require('../lib/index');
-const isAdmin = require('../lib/isAdmin');
-const config = require('../config');
+import isAdmin from '../lib/isAdmin.js';
+import config from '../config.js';
 
 const WARN_COUNT = config.WARN_COUNT || 3;
 
@@ -90,4 +90,4 @@ async function Antilink(msg, sock) {
 	}
 }
 
-module.exports = { Antilink };
+export default { Antilink };

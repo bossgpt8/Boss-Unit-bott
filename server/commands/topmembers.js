@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const dataFilePath = path.join(__dirname, '..', 'data', 'messageCount.json');
 
@@ -57,4 +57,4 @@ function topMembers(sock, chatId, isGroup) {
     sock.sendMessage(chatId, { text: message, mentions: sortedMembers.map(([userId]) => userId) });
 }
 
-module.exports = { incrementMessageCount, topMembers };
+export default { incrementMessageCount, topMembers };

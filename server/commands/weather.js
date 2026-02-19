@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 async function weatherCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -28,4 +28,4 @@ async function weatherCommand(sock, chatId, senderId, mentionedJids, message, ar
     }
 }
 
-module.exports = weatherCommand;
+export default weatherCommand;

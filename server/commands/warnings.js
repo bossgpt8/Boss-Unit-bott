@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const warningsFilePath = path.join(__dirname, '../data/warnings.json');
 
@@ -25,4 +25,4 @@ async function warningsCommand(sock, chatId, mentionedJidList) {
     await sock.sendMessage(chatId, { text: `User has ${warningCount} warning(s).` });
 }
 
-module.exports = warningsCommand;
+export default warningsCommand;

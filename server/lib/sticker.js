@@ -1,11 +1,11 @@
-const fs = require('fs')
-const path = require('path')
-const crypto = require('crypto')
+import fs from 'fs'
+import path from 'path'
+import crypto from 'crypto'
 const { spawn } = require('child_process')
 const { fileTypeFromBuffer } = require('file-type')
-const webp = require('node-webpmux')
-const fetch = require('node-fetch')
-const ffmpeg = require('fluent-ffmpeg')
+import webp from 'node-webpmux.js'
+import fetch from 'node-fetch'
+import ffmpeg from 'fluent-ffmpeg'
 const { exec } = require('child_process')
 const { promisify } = require('util')
 const execAsync = promisify(exec)
@@ -197,7 +197,7 @@ const support = {
   find: false
 }
 
-module.exports = {
+export default {
   sticker,
   sticker2,
   sticker3,

@@ -1,7 +1,7 @@
-const { handleWelcome } = require('../lib/welcome');
-const { isWelcomeOn, getWelcome } = require('../lib/index');
-const { channelInfo } = require('../lib/messageConfig');
-const fetch = require('node-fetch');
+import { handleWelcome } from '../lib/welcome.js';
+import { isWelcomeOn, getWelcome } from '../lib/index.js';
+import { channelInfo } from '../lib/messageConfig.js';
+import fetch from 'node-fetch';
 
 async function welcomeCommand(sock, chatId, message, match) {
     // Check if it's a group
@@ -147,4 +147,4 @@ async function handleJoinEvent(sock, id, participants) {
     }
 }
 
-module.exports = { welcomeCommand, handleJoinEvent };
+export default { welcomeCommand, handleJoinEvent };

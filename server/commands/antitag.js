@@ -1,5 +1,5 @@
-const { setAntitag, getAntitag, removeAntitag } = require('../lib/index');
-const isAdmin = require('../lib/isAdmin');
+import { setAntitag, getAntitag, removeAntitag } from '../lib/index.js';
+import isAdmin from '../lib/isAdmin.js';
 
 async function handleAntitagCommand(sock, chatId, userMessage, senderId, isSenderAdmin, message) {
     try {
@@ -180,7 +180,7 @@ async function handleTagDetection(sock, chatId, message, senderId) {
     }
 }
 
-module.exports = {
+export default {
     handleAntitagCommand,
     handleTagDetection
 };

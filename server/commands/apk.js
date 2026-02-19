@@ -1,7 +1,7 @@
-const { exec } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-const axios = require('axios');
+import { exec } from 'child_process';
+import path from 'path';
+import fs from 'fs';
+import axios from 'axios';
 
 async function apkCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -72,4 +72,4 @@ async function apkCommand(sock, chatId, senderId, mentionedJids, message, args) 
     }
 }
 
-module.exports = apkCommand;
+export default apkCommand;

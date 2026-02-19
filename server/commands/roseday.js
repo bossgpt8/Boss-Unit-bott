@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 async function rosedayCommand(sock, chatId, message) {
     try {
@@ -20,4 +20,4 @@ async function rosedayCommand(sock, chatId, message) {
     }
 }
 
-module.exports = { rosedayCommand };
+export default { rosedayCommand };

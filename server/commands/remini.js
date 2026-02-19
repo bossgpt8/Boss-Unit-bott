@@ -1,6 +1,6 @@
-const axios = require('axios');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
-const { uploadImage } = require('../lib/uploadImage');
+import axios from 'axios';
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+import { uploadImage } from '../lib/uploadImage.js';
 
 async function getQuotedOrOwnImageUrl(sock, message) {
     // 1) Quoted image (highest priority)
@@ -122,4 +122,4 @@ function isValidUrl(string) {
     }
 }
 
-module.exports = { reminiCommand };
+export default { reminiCommand };

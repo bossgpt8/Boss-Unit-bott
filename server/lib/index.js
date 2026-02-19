@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import fs from 'fs';
+import path from 'path';
 
 // Function to load user and group data from JSON file
 function loadUserGroupData() {
@@ -442,7 +442,7 @@ async function removeChatbot(groupId) {
     }
 }
 
-module.exports = {
+export default {
     // ... existing exports
     setAntilink,
     getAntilink,

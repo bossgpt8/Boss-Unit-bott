@@ -1,4 +1,4 @@
-const { storage } = require('../storage');
+import { storage } from '../storage.js';
 
 async function autoreadCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     try {
@@ -32,7 +32,7 @@ async function autoreadCommand(sock, chatId, senderId, mentionedJids, message, a
     }
 }
 
-module.exports = {
+export default {
     execute: autoreadCommand,
     autoreadCommand
 };

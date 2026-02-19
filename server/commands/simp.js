@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 async function simpCommand(sock, chatId, quotedMsg, mentionedJid, sender) {
     try {
@@ -61,4 +61,4 @@ async function simpCommand(sock, chatId, quotedMsg, mentionedJid, sender) {
     }
 }
 
-module.exports = { simpCommand }; 
+export default { simpCommand }; 

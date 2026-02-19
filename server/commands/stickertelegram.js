@@ -1,13 +1,13 @@
-const fetch = require('node-fetch');
-const { writeExifImg } = require('../lib/exif');
+import fetch from 'node-fetch';
+import { writeExifImg } from '../lib/exif.js';
 const delay = time => new Promise(res => setTimeout(res, time));
-const fs = require('fs');
-const path = require('path');
-const sharp = require('sharp');
-const webp = require('node-webpmux');
-const crypto = require('crypto');
-const { exec } = require('child_process');
-const settings = require('../settings');
+import fs from 'fs';
+import path from 'path';
+import sharp from 'sharp';
+import webp from 'node-webpmux.js';
+import crypto from 'crypto';
+import { exec } from 'child_process';
+import settings from '../settings.js';
 
 async function stickerTelegramCommand(sock, chatId, msg) {
     try {
@@ -183,4 +183,4 @@ async function stickerTelegramCommand(sock, chatId, msg) {
     }
 }
 
-module.exports = stickerTelegramCommand; 
+export default stickerTelegramCommand; 

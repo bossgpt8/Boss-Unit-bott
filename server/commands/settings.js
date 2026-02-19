@@ -1,7 +1,6 @@
-const { storage } = require('../storage');
-
 async function settingsCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     try {
+        const { storage } = await import('../storage.js');
         // Check if user is owner
         const settings = userId ? await storage.getUserSettings(userId) : await storage.getSettings();
         const isOwner = message.key?.fromMe || settings.ownerNumber === senderId.split('@')[0] || settings.ownerNumber === senderId.split(':')[0];
@@ -41,7 +40,7 @@ async function settingsCommand(sock, chatId, senderId, mentionedJids, message, a
         lines.push('> ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ ʙʏ ʙᴏss ʙᴏᴛ');
         lines.push('> ᴠɪᴇᴡ ᴜᴘᴅᴀᴛᴇs ʜᴇʀᴇ: 120363426051727952@ɴᴇᴡsʟᴇᴛᴛᴇʀ');
 
-        const { channelInfo } = require("../lib/messageConfig");
+        const { channelInfo } = await import("../lib/messageConfig.js");
         await sock.sendMessage(chatId, {
             text: lines.join('\n'),
             contextInfo: {
@@ -64,4 +63,4 @@ async function settingsCommand(sock, chatId, senderId, mentionedJids, message, a
     }
 }
 
-module.exports = settingsCommand;
+export default settingsCommand;

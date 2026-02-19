@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 async function goodnightCommand(sock, chatId, message) {
     try {
@@ -20,4 +20,4 @@ async function goodnightCommand(sock, chatId, message) {
     }
 }
 
-module.exports = { goodnightCommand }; 
+export default { goodnightCommand }; 

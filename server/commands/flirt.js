@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 async function flirtCommand(sock, chatId, message) {
     try {
@@ -76,4 +76,4 @@ async function flirtCommand(sock, chatId, message) {
     }
 }
 
-module.exports = { flirtCommand };
+export default { flirtCommand };

@@ -41,4 +41,4 @@ async function staffCommand(sock, chatId, msg) {
     }
 }
 
-module.exports = staffCommand; 
+export default staffCommand; 

@@ -11,9 +11,9 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "baseUrl": ".",
-    "types": ["node", "vite/client", "react", "react-dom"], // ← add react types
+    "types": ["node", "vite/client", "react", "react-dom"],
     "paths": {
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"]

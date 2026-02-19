@@ -1,5 +1,5 @@
-const axios = require('axios');
-const settings = require('../settings'); // Assuming the API key is stored here
+import axios from 'axios';
+import settings from '../settings.js'; // Assuming the API key is stored here
 
 async function gifCommand(sock, chatId, query) {
     const apiKey = settings.giphyApiKey; // Replace with your Giphy API Key
@@ -32,4 +32,4 @@ async function gifCommand(sock, chatId, query) {
     }
 }
 
-module.exports = gifCommand;
+export default gifCommand;

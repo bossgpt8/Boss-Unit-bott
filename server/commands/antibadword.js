@@ -1,5 +1,5 @@
-const { handleAntiBadwordCommand } = require('../lib/antibadword');
-const isAdminHelper = require('../lib/isAdmin');
+import { handleAntiBadwordCommand } from '../lib/antibadword.js';
+import isAdminHelper from '../lib/isAdmin.js';
 
 async function antibadwordCommand(sock, chatId, message, senderId, isSenderAdmin) {
     try {
@@ -20,4 +20,4 @@ async function antibadwordCommand(sock, chatId, message, senderId, isSenderAdmin
     }
 }
 
-module.exports = antibadwordCommand; 
+export default antibadwordCommand; 

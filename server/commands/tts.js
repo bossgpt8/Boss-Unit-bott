@@ -1,6 +1,6 @@
-const gTTS = require('gtts');
-const fs = require('fs');
-const path = require('path');
+import gTTS from 'gtts';
+import fs from 'fs';
+import path from 'path';
 
 async function ttsCommand(sock, chatId, text, message, language = 'en') {
     if (!text) {
@@ -27,4 +27,4 @@ async function ttsCommand(sock, chatId, text, message, language = 'en') {
     });
 }
 
-module.exports = ttsCommand;
+export default ttsCommand;

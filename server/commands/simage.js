@@ -1,9 +1,9 @@
-const sharp = require('sharp');
-const fs = require('fs');
-const fsPromises = require('fs/promises');
-const fse = require('fs-extra');
-const path = require('path');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+import sharp from 'sharp';
+import fs from 'fs';
+import fsPromises from 'fs/promises.js';
+import fse from 'fs-extra';
+import path from 'path';
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
 
 const tempDir = './temp';
 if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
@@ -48,4 +48,4 @@ const convertStickerToImage = async (sock, quotedMessage, chatId) => {
     }
 };
 
-module.exports = convertStickerToImage;
+export default convertStickerToImage;

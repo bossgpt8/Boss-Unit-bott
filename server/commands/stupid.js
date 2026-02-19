@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 async function stupidCommand(sock, chatId, quotedMsg, mentionedJid, sender, args) {
     try {
@@ -47,4 +47,4 @@ async function stupidCommand(sock, chatId, quotedMsg, mentionedJid, sender, args
     }
 }
 
-module.exports = { stupidCommand }; 
+export default { stupidCommand }; 

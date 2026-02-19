@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // List of emojis for command reactions
 const commandEmojis = ['⏳'];
@@ -102,7 +102,7 @@ async function handleAreactCommand(sock, chatId, message, isOwner) {
     }
 }
 
-module.exports = {
+export default {
     addCommandReaction,
     handleAreactCommand
 }; 

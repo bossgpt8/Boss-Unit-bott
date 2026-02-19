@@ -1,4 +1,4 @@
-const lyricsFinder = require("lyrics-finder");
+import lyricsFinder from 'lyrics-finder.js';
 
 async function lyricsCommand(sock, chatId, songTitle, message) {
     if (!songTitle) {
@@ -33,4 +33,4 @@ async function lyricsCommand(sock, chatId, songTitle, message) {
     }
 }
 
-module.exports = { lyricsCommand };
+export default { lyricsCommand };

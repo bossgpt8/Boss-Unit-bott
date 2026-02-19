@@ -1,6 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const fetch = require('node-fetch');
+import fs from 'fs';
+import path from 'path';
+import fetch from 'node-fetch';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const USER_GROUP_DATA = path.join(__dirname, '../data/userGroupData.json');
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
@@ -54,7 +58,7 @@ async function showTyping(sock, chatId) {
     } catch (error) {}
 }
 
-async function handleChatbotCommand(sock, chatId, senderId, mentionedJids, message, args) {
+export async function handleChatbotCommand(sock, chatId, senderId, mentionedJids, message, args) {
     const match = args && args.length > 0 ? args[0].toLowerCase() : '';
     const data = loadUserGroupData();
     
@@ -66,7 +70,7 @@ async function handleChatbotCommand(sock, chatId, senderId, mentionedJids, messa
         }, { quoted: message });
     }
 
-    const isOwnerOrSudo = require('../lib/isOwner');
+    const isOwnerOrSudo = (await import('../lib/isOwner.js')).default;
     const isOwner = await isOwnerOrSudo(senderId, sock, chatId);
     
     // In multi-user mode, use currentUserId for owner check
@@ -126,7 +130,7 @@ async function handleChatbotCommand(sock, chatId, senderId, mentionedJids, messa
     return sock.sendMessage(chatId, { text: '*Invalid command. Use .chatbot to see usage*' }, { quoted: message });
 }
 
-async function handleChatbotResponse(sock, chatId, message, userMessage, senderId) {
+export async function handleChatbotResponse(sock, chatId, message, userMessage, senderId) {
     const data = loadUserGroupData();
     const isPrivate = !chatId.endsWith('@g.us');
     
@@ -318,8 +322,4 @@ Examples of good responses:
     return null;
 }
 
-module.exports = { 
-    execute: handleChatbotCommand,
-    handleChatbotCommand, 
-    handleChatbotResponse 
-};
+export const execute = handleChatbotCommand;

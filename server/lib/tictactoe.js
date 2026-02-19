@@ -74,4 +74,4 @@ class TicTacToe {
     }
 }
 
-module.exports = TicTacToe; 
+export default TicTacToe; 

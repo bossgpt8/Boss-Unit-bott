@@ -1,8 +1,8 @@
-const fetch = require('node-fetch');
-const FormData = require('form-data');
-const FileType = require('file-type');
-const fs = require('fs');
-const path = require('path');
+import fetch from 'node-fetch';
+import FormData from 'form-data';
+import FileType from 'file-type.js';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Upload file to qu.ax
@@ -72,7 +72,7 @@ async function uploadImage(buffer) {
     }
 }
 
-module.exports = { uploadImage };
+export default { uploadImage };
 
 /**
  * Alternative upload to telegra.ph (backup)

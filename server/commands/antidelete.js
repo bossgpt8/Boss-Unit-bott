@@ -1,5 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const STORAGE_FILE = path.join(__dirname, '../data/deleted_messages.json');
 
@@ -38,49 +42,44 @@ function updateState(chatId, newState) {
     return antideleteSettings[chatId];
 }
 
-async function storeMessage(sock, msg) {
-    // Always store messages if we want to catch deletions, 
-    // but check if enabled during the actual revocation handling
+export async function storeMessage(sock, msg) {
     if (!msg.message || msg.key.remoteJid === 'status@broadcast') return;
-    
-    // Don't store protocol messages (revocations etc)
     if (msg.message.protocolMessage) return;
 
-    const storage = readStorage();
+    const storageData = readStorage();
     const chatId = msg.key.remoteJid;
     const msgId = msg.key.id;
     
-    if (!storage[chatId]) storage[chatId] = {};
-    storage[chatId][msgId] = JSON.parse(JSON.stringify(msg)); // Deep copy to preserve message content
+    if (!storageData[chatId]) storageData[chatId] = {};
+    storageData[chatId][msgId] = JSON.parse(JSON.stringify(msg));
     
-    // Keep only last 100 messages per chat
-    const keys = Object.keys(storage[chatId]);
+    const keys = Object.keys(storageData[chatId]);
     if (keys.length > 100) {
-        delete storage[chatId][keys[0]];
+        delete storageData[chatId][keys[0]];
     }
     
-    writeStorage(storage);
+    writeStorage(storageData);
 }
 
-async function handleMessageRevocation(sock, msg) {
+export async function handleMessageRevocation(sock, msg) {
     const chatId = msg.key.remoteJid;
     const { enabled } = readState(chatId);
     
-    // Check if enabled globally or for this chat
-    const { storage } = require('../storage');
+    const { storage } = await import('../storage.js');
     const settings = await storage.getSettings();
     if (!enabled && !settings.antiDelete) return;
 
     try {
         const protocolMsg = msg.message.protocolMessage;
-        if (!protocolMsg || protocolMsg.type !== 0) return; // type 0 is REVOKE
+        if (!protocolMsg || protocolMsg.type !== 0) return;
 
         const targetId = protocolMsg.key.id;
-        
-        const storage = readStorage();
-        const { channelInfo } = require("../lib/messageConfig");
-        if (storage[chatId] && storage[chatId][targetId]) {
-            const deletedMsg = storage[chatId][targetId];
+        const storageData = readStorage();
+        const config = await import("../lib/messageConfig.js");
+        const channelInfo = config.default || config.channelInfo || config;
+
+        if (storageData[chatId] && storageData[chatId][targetId]) {
+            const deletedMsg = storageData[chatId][targetId];
             const sender = deletedMsg.key.participant || deletedMsg.key.remoteJid;
             const senderName = sender.split('@')[0];
             
@@ -101,9 +100,9 @@ async function handleMessageRevocation(sock, msg) {
     }
 }
 
-async function antideleteCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
+export async function antideleteCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     const cmd = args[0]?.toLowerCase();
-    const { storage } = require('../storage');
+    const { storage } = await import('../storage.js');
     
     if (cmd === 'on') {
         if (userId) await storage.updateUserSettings(userId, { antiDelete: true });
@@ -121,4 +120,4 @@ async function antideleteCommand(sock, chatId, senderId, mentionedJids, message,
     }
 }
 
-module.exports = { storeMessage, handleMessageRevocation, antideleteCommand };
+export default { storeMessage, handleMessageRevocation, antideleteCommand };

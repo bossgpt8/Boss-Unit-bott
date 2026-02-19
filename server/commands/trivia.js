@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 let triviaGames = {};
 
@@ -43,4 +43,4 @@ function answerTrivia(sock, chatId, answer) {
     delete triviaGames[chatId];
 }
 
-module.exports = { startTrivia, answerTrivia };
+export default { startTrivia, answerTrivia };

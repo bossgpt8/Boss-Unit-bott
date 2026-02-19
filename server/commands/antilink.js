@@ -1,6 +1,6 @@
-const { bots } = require('../lib/antilink');
-const { setAntilink, getAntilink, removeAntilink } = require('../lib/index');
-const isAdmin = require('../lib/isAdmin');
+import { bots } from '../lib/antilink.js';
+import { setAntilink, getAntilink, removeAntilink } from '../lib/index.js';
+import isAdmin from '../lib/isAdmin.js';
 
 async function handleAntilinkCommand(sock, chatId, userMessage, senderId, isSenderAdmin, message) {
     try {
@@ -135,7 +135,7 @@ async function handleLinkDetection(sock, chatId, message, userMessage, senderId)
     }
 }
 
-module.exports = {
+export default {
     handleAntilinkCommand,
     handleLinkDetection,
 };

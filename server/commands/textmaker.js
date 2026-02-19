@@ -1,5 +1,5 @@
-const axios = require('axios');
-const mumaker = require('mumaker');
+import axios from 'axios';
+import mumaker from 'mumaker.js';
 
 // Base channel info template
 const channelInfo = {
@@ -114,4 +114,4 @@ async function textmakerCommand(sock, chatId, message, q, type) {
     }
 }
 
-module.exports = textmakerCommand; 
+export default textmakerCommand; 

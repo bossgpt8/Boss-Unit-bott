@@ -3,11 +3,9 @@ import { storage } from "./storage";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
-import { createRequire } from "module";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const require = createRequire(import.meta.url);
 
 const COMMANDS_DIR = path.join(__dirname, "commands");
 const loadedCommands = new Map<string, Function>();
@@ -20,16 +18,16 @@ const COMMAND_ALIASES: Record<string, string> = {
   "yt": "play", "music": "play", "unlink": "logout", "logoutbot": "logout"
 };
 
-function initCommands() {
+async function initCommands() {
   if (fs.existsSync(COMMANDS_DIR)) {
     const files = fs.readdirSync(COMMANDS_DIR).filter(f => f.endsWith(".js"));
     for (const file of files) {
       try {
         const commandName = path.basename(file, ".js");
         const filePath = path.join(COMMANDS_DIR, file);
-        delete require.cache[require.resolve(filePath)];
-        const cmdModule = require(filePath);
-        let cmdFunc = typeof cmdModule === 'function' ? cmdModule : (cmdModule.execute || cmdModule.default || Object.values(cmdModule).find(v => typeof v === 'function'));
+        const cmdModule = await import(`./commands/${file}`);
+        let cmdFunc = cmdModule.default || cmdModule.execute || Object.values(cmdModule).find(v => typeof v === 'function');
+        
         if (cmdFunc) {
           loadedCommands.set(commandName, cmdFunc);
           console.log(`[INFO] Loaded command: ${commandName}`);
@@ -43,13 +41,15 @@ function initCommands() {
 
 async function checkIsOwner(senderId: string, sock: WASocket, chatId: string): Promise<boolean> {
   try {
-    const isOwnerOrSudo = require('./lib/isOwner');
+    const isOwnerModule = await import('./lib/isOwner.js');
+    const isOwnerOrSudo = isOwnerModule.default || isOwnerModule;
     return await isOwnerOrSudo(senderId, sock, chatId);
   } catch (e) {
     return false;
   }
 }
 
+// Initial load
 initCommands();
 
 export async function handleCommand(sock: WASocket, msg: proto.IWebMessageInfo, userId?: string) {
@@ -70,8 +70,8 @@ export async function handleCommand(sock: WASocket, msg: proto.IWebMessageInfo, 
     if (!isFromMe && settings.autoRead) await sock.readMessages([msg.key]);
     if (isFromMe) return;
     try {
-      const chatbotModule = require("./commands/chatbot.js");
-      if (chatbotModule?.handleChatbotResponse) {
+      const chatbotModule = await import("./commands/chatbot.js");
+      if (chatbotModule && chatbotModule.handleChatbotResponse) {
         await chatbotModule.handleChatbotResponse(sock, remoteJid, msg, content, sender);
       }
     } catch (e) {
@@ -104,9 +104,16 @@ export async function handleCommand(sock: WASocket, msg: proto.IWebMessageInfo, 
   if (loadedCommands.has(commandName)) {
     try {
       const cmdFunc = loadedCommands.get(commandName);
-      const botManager = (await import('./botManager')).botManager;
-      botManager['log'](userId || "default", "info", `Executing command: .${commandName} for ${sender}`);
-      if (typeof cmdFunc === 'function') await cmdFunc(sock, remoteJid, sender, mentionedJids, msg, args, quotedParticipant);
+      const botManagerModule = await import('./botManager.js');
+      const botManager = botManagerModule.botManager || botManagerModule.default?.botManager;
+      
+      if (botManager && typeof (botManager as any).log === 'function') {
+        (botManager as any).log(userId || "default", "info", `Executing command: .${commandName} for ${sender}`);
+      }
+
+      if (typeof cmdFunc === 'function') {
+        await cmdFunc(sock, remoteJid, sender, mentionedJids, msg, args, quotedParticipant);
+      }
     } catch (err) {
       console.error(`Error in ${commandName}:`, err);
     }

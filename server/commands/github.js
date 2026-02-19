@@ -1,7 +1,7 @@
-const moment = require("moment-timezone");
-const fetch = require("node-fetch");
-const fs = require("fs");
-const path = require("path");
+import moment from 'moment-timezone.js';
+import fetch from 'node-fetch';
+import fs from 'fs';
+import path from 'path';
 
 async function githubCommand(sock, chatId, message) {
   try {
@@ -39,4 +39,4 @@ async function githubCommand(sock, chatId, message) {
   }
 }
 
-module.exports = githubCommand;
+export default githubCommand;

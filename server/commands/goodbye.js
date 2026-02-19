@@ -1,6 +1,6 @@
-const { handleGoodbye } = require('../lib/welcome');
-const { isGoodByeOn, getGoodbye } = require('../lib/index');
-const fetch = require('node-fetch');
+import { handleGoodbye } from '../lib/welcome.js';
+import { isGoodByeOn, getGoodbye } from '../lib/index.js';
+import fetch from 'node-fetch';
 
 async function goodbyeCommand(sock, chatId, message, match) {
     // Check if it's a group
@@ -129,4 +129,4 @@ async function handleLeaveEvent(sock, id, participants) {
     }
 }
 
-module.exports = { goodbyeCommand, handleLeaveEvent };
+export default { goodbyeCommand, handleLeaveEvent };

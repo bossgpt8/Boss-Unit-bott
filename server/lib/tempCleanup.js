@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // Utility for cleaning temp files
 function cleanupTempFiles() {
@@ -49,5 +49,5 @@ cleanupTempFiles();
 // Cleanup every hour
 setInterval(cleanupTempFiles, 60 * 60 * 1000);
 
-module.exports = { cleanupTempFiles };
+export default { cleanupTempFiles };
 

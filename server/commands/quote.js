@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 async function quoteCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -37,4 +37,4 @@ async function quoteCommand(sock, chatId, senderId, mentionedJids, message, args
     }
 }
 
-module.exports = quoteCommand;
+export default quoteCommand;

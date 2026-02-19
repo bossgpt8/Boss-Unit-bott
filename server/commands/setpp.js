@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
-const isOwnerOrSudo = require('../lib/isOwner');
+import fs from 'fs';
+import path from 'path';
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+import isOwnerOrSudo from '../lib/isOwner.js';
 
 async function setProfilePicture(sock, chatId, msg) {
     try {
@@ -70,4 +70,4 @@ async function setProfilePicture(sock, chatId, msg) {
     }
 }
 
-module.exports = setProfilePicture; 
+export default setProfilePicture; 

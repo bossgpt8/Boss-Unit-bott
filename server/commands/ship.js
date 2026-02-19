@@ -30,4 +30,4 @@ async function shipCommand(sock, chatId, msg, groupMetadata) {
     }
 }
 
-module.exports = shipCommand; 
+export default shipCommand; 

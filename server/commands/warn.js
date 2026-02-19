@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const isAdmin = require('../lib/isAdmin');
+import fs from 'fs';
+import path from 'path';
+import isAdmin from '../lib/isAdmin.js';
 
 // Define paths
 const databaseDir = path.join(process.cwd(), 'data');
@@ -151,4 +151,4 @@ async function warnCommand(sock, chatId, senderId, mentionedJids, message) {
     }
 }
 
-module.exports = warnCommand;
+export default warnCommand;

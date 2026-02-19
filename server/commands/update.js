@@ -1,8 +1,8 @@
-const { exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const settings = require('../settings');
-const isOwnerOrSudo = require('../lib/isOwner');
+import { exec } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import settings from '../settings.js';
+import isOwnerOrSudo from '../lib/isOwner.js';
 
 function run(cmd) {
     return new Promise((resolve, reject) => {
@@ -72,4 +72,4 @@ async function updateCommand(sock, chatId, senderId, mentionedJids, message, arg
     }
 }
 
-module.exports = updateCommand;
+export default updateCommand;

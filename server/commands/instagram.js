@@ -1,6 +1,6 @@
-const { exec } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+const { exec } = (await import('child_process')).default;
+const path = (await import('path')).default;
+const fs = (await import('fs')).default;
 
 async function instagramCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -41,4 +41,4 @@ async function instagramCommand(sock, chatId, senderId, mentionedJids, message, 
     }
 }
 
-module.exports = instagramCommand;
+export default instagramCommand;

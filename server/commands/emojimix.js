@@ -1,7 +1,7 @@
-const fetch = require('node-fetch');
-const fs = require('fs');
-const { exec } = require('child_process');
-const path = require('path');
+import fetch from 'node-fetch';
+import fs from 'fs';
+import { exec } from 'child_process';
+import path from 'path';
 
 async function emojimixCommand(sock, chatId, msg) {
     try {
@@ -99,4 +99,4 @@ async function emojimixCommand(sock, chatId, msg) {
     }
 }
 
-module.exports = emojimixCommand; 
+export default emojimixCommand; 

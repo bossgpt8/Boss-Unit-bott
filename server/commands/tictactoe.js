@@ -1,4 +1,4 @@
-const TicTacToe = require('../lib/tictactoe');
+import TicTacToe from '../lib/tictactoe.js';
 
 // Store games globally
 const games = {};
@@ -69,7 +69,7 @@ ${arr.slice(6).join('')}
 `;
 
             // Send message only once to the group
-            const { channelInfo } = require("../lib/messageConfig");
+            import { channelInfo } from '../lib/messageConfig.js';
             await sock.sendMessage(chatId, { 
                 text: str,
                 mentions: [room.game.currentTurn, room.game.playerX, room.game.playerO],
@@ -182,7 +182,7 @@ ${!winner && !isTie ? '• Type a number (1-9) to make your move\n• Type *surr
             ...(winner ? [winner] : [room.game.currentTurn])
         ];
 
-        const { channelInfo } = require("../lib/messageConfig");
+        import { channelInfo } from '../lib/messageConfig.js';
         await sock.sendMessage(room.x, { 
             text: str,
             mentions: mentions,
@@ -207,7 +207,7 @@ ${!winner && !isTie ? '• Type a number (1-9) to make your move\n• Type *surr
     }
 }
 
-module.exports = {
+export default {
     tictactoeCommand,
     handleTicTacToeMove
 };

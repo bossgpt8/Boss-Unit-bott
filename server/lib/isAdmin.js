@@ -77,4 +77,4 @@ async function isAdmin(sock, chatId, senderId) {
     }
 }
 
-module.exports = isAdmin;
+export default isAdmin;

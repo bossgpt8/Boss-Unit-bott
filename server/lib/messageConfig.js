@@ -28,6 +28,6 @@ const channelInfo = {
     footer: 'Forwarded from Boss Bot-MD Updates'
 };
 
-module.exports = {
+export default {
     channelInfo: channelInfo,
 };

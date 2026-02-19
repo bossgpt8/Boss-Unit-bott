@@ -1,4 +1,4 @@
-const { storage } = require("../storage");
+import { storage } from '../storage.js';
 
 async function setOwnerCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     try {
@@ -22,4 +22,4 @@ async function setOwnerCommand(sock, chatId, senderId, mentionedJids, message, a
     }
 }
 
-module.exports = setOwnerCommand;
+export default setOwnerCommand;

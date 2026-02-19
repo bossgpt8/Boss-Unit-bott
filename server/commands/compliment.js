@@ -145,4 +145,4 @@ async function complimentCommand(sock, chatId, message) {
     }
 }
 
-module.exports = { complimentCommand };
+export default { complimentCommand };

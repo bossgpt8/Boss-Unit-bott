@@ -1,5 +1,5 @@
-const { storage } = require('../storage');
-const isOwnerOrSudo = require('../lib/isOwner');
+import { storage } from '../storage.js';
+import isOwnerOrSudo from '../lib/isOwner.js';
 
 async function modeCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     try {
@@ -55,4 +55,4 @@ Current Mode: ${currentMode}
     }
 }
 
-module.exports = modeCommand;
+export default modeCommand;

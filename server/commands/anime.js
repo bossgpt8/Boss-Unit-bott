@@ -1,9 +1,9 @@
-const axios = require('axios');
-const { exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const webp = require('node-webpmux');
-const crypto = require('crypto');
+import axios from 'axios';
+import { exec } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import webp from 'node-webpmux.js';
+import crypto from 'crypto';
 
 const ANIMU_BASE = 'https://api.some-random-api.com/animu';
 
@@ -148,6 +148,6 @@ async function animeCommand(sock, chatId, message, args) {
     }
 }
 
-module.exports = { animeCommand };
+export default { animeCommand };
 
 

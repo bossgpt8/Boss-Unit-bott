@@ -1,4 +1,4 @@
-const fetch = require("node-fetch");
+import fetch from 'node-fetch';
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
@@ -136,4 +136,4 @@ async function aiCommand(sock, chatId, senderId, mentionedJids, message, args) {
     }
 }
 
-module.exports = aiCommand;
+export default aiCommand;

@@ -1,6 +1,6 @@
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
-const { exec } = require('child_process');
-const fs = require('fs');
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+import { exec } from 'child_process';
+import fs from 'fs';
 
 async function stickerCommand(sock, chatId, message) {
     try {
@@ -58,4 +58,4 @@ async function stickerCommand(sock, chatId, message) {
     }
 }
 
-module.exports = stickerCommand;
+export default stickerCommand;

@@ -1,6 +1,6 @@
-const { downloadMediaMessage } = require('@whiskeysockets/baileys');
-const axios = require('axios');
-const sharp = require('sharp');
+import { downloadMediaMessage } from '@whiskeysockets/baileys';
+import axios from 'axios';
+import sharp from 'sharp';
 
 async function blurCommand(sock, chatId, message, quotedMessage) {
     try {
@@ -80,4 +80,4 @@ async function blurCommand(sock, chatId, message, quotedMessage) {
     }
 }
 
-module.exports = blurCommand; 
+export default blurCommand; 

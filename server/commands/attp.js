@@ -1,7 +1,7 @@
-const { spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const { writeExifImg, writeExifVid } = require('../lib/exif');
+import { spawn } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { writeExifImg, writeExifVid } from '../lib/exif.js';
 
 async function attpCommand(sock, chatId, message) {
     const userMessage = message.message.conversation || message.message.extendedTextMessage?.text || '';
@@ -24,7 +24,7 @@ async function attpCommand(sock, chatId, message) {
     }
 }
 
-module.exports = attpCommand;
+export default attpCommand;
 
 function renderTextToPngWithFfmpeg(text) {
     return new Promise((resolve, reject) => {

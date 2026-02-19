@@ -50,4 +50,4 @@ ${listAdmin}
     }
 }
 
-module.exports = groupInfoCommand; 
+export default groupInfoCommand; 

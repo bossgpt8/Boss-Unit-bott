@@ -1,4 +1,4 @@
-const isAdmin = require('../lib/isAdmin');
+import isAdmin from '../lib/isAdmin.js';
 
 async function muteCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -46,4 +46,4 @@ async function muteCommand(sock, chatId, senderId, mentionedJids, message, args)
     }
 }
 
-module.exports = muteCommand;
+export default muteCommand;
