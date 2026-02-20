@@ -58,18 +58,21 @@ export class FirestoreStorage implements IStorage {
 
   async addLog(level: string, message: string): Promise<Log> {
     const logData = { level, message, timestamp: new Date().toISOString() };
-    // Console only, no Firestore persistence to maintain speed
-    console.log(`[BOT LOG] [${level.toUpperCase()}] ${message}`);
+    addDoc(collection(db, "logs"), logData).catch(err => {
+      console.error("Async logging to Firestore failed:", err);
+    });
     return logData as any;
   }
 
   async getLogs(lim = 50): Promise<Log[]> {
-    // Return empty as we don't persist logs to Firestore anymore
-    return [];
+    const q = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(lim));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ ...d.data(), id: d.id })) as any;
   }
 
   async clearLogs(): Promise<void> {
-    // No-op
+    const snap = await getDocs(collection(db, "logs"));
+    for (const d of snap.docs) await deleteDoc(d.ref);
   }
 
   async createUserSession(session: InsertUserSession): Promise<UserSession> {
@@ -119,18 +122,21 @@ export class FirestoreStorage implements IStorage {
 
   async addUserLog(userId: string, level: string, message: string): Promise<UserLog> {
     const log = { userId, level, message, timestamp: new Date().toISOString() };
-    // Console only, no Firestore persistence to maintain speed
-    console.log(`[USER LOG] [${userId}] [${level.toUpperCase()}] ${message}`);
+    addDoc(collection(db, `user_logs_${userId}`), log).catch(err => {
+      console.error(`Async logging for user ${userId} failed:`, err);
+    });
     return log as any;
   }
 
   async getUserLogs(userId: string, lim = 50): Promise<UserLog[]> {
-    // Return empty as we don't persist logs to Firestore anymore
-    return [];
+    const q = query(collection(db, `user_logs_${userId}`), orderBy("timestamp", "desc"), limit(lim));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => d.data()) as any;
   }
 
   async clearUserLogs(userId: string): Promise<void> {
-    // No-op
+    const snap = await getDocs(collection(db, `user_logs_${userId}`));
+    for (const d of snap.docs) await deleteDoc(d.ref);
   }
 }
 

@@ -1,4 +1,4 @@
-import axios from 'axios';
+const axios = require('axios');
 
 async function jokeCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -14,4 +14,4 @@ async function jokeCommand(sock, chatId, senderId, mentionedJids, message, args)
     }
 }
 
-export default jokeCommand;
+module.exports = jokeCommand;

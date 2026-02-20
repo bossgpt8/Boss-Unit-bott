@@ -9,8 +9,8 @@
  * - Baileys Library by @adiwajshing
  * - Pair Code implementation inspired by TechGod143 & DGXEON
  */
-import fs from 'fs'
-import path from 'path'
+const fs = require('fs')
+const path = require('path')
 const { spawn } = require('child_process')
 
 function ffmpeg(buffer, args = [], ext = '', ext2 = '') {
@@ -92,7 +92,7 @@ function toVideo(buffer, ext) {
   ], ext, 'mp4')
 }
 
-export default {
+module.exports = {
   toAudio,
   toPTT,
   toVideo,

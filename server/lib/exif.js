@@ -9,12 +9,12 @@
  * - Baileys Library by @adiwajshing
  * - Pair Code implementation inspired by TechGod143 & DGXEON
  */
-import fs from 'fs'
+const fs = require('fs')
 const { tmpdir } = require("os")
-import Crypto from 'crypto'
-import ff from 'fluent-ffmpeg'
-import webp from 'node-webpmux.js'
-import path from 'path'
+const Crypto = require("crypto")
+const ff = require('fluent-ffmpeg')
+const webp = require("node-webpmux")
+const path = require("path")
 
 
 async function imageToWebp (media) {
@@ -145,4 +145,4 @@ async function writeExif (media, metadata) {
     }
 }
 
-export default { imageToWebp, videoToWebp, writeExifImg, writeExifVid, writeExif }
+module.exports = { imageToWebp, videoToWebp, writeExifImg, writeExifVid, writeExif }

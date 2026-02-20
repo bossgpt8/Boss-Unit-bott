@@ -1,6 +1,6 @@
-import { exec } from 'child_process';
-import path from 'path';
-import fs from 'fs';
+const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 async function videoCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -47,4 +47,4 @@ async function videoCommand(sock, chatId, senderId, mentionedJids, message, args
     }
 }
 
-export default videoCommand;
+module.exports = videoCommand;

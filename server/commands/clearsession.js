@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import isOwnerOrSudo from '../lib/isOwner.js';
+const fs = require('fs');
+const path = require('path');
+const isOwnerOrSudo = require('../lib/isOwner');
 
 async function clearSessionCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -49,4 +49,4 @@ async function clearSessionCommand(sock, chatId, senderId, mentionedJids, messag
     }
 }
 
-export default clearSessionCommand;
+module.exports = clearSessionCommand;

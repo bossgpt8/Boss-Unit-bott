@@ -1,4 +1,4 @@
-import { storage } from '../storage.js';
+const { storage } = require('../storage');
 
 async function setbotnameCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     try {
@@ -30,4 +30,4 @@ async function setbotnameCommand(sock, chatId, senderId, mentionedJids, message,
     }
 }
 
-export default setbotnameCommand;
+module.exports = setbotnameCommand;

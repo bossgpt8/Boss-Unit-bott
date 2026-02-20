@@ -1,7 +1,7 @@
-import { downloadContentFromMessage } from '@whiskeysockets/baileys';
-import fs from 'fs';
-import path from 'path';
-import { UploadFileUgu, TelegraPh } from '../lib/uploader.js';
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+const fs = require('fs');
+const path = require('path');
+const { UploadFileUgu, TelegraPh } = require('../lib/uploader');
 
 async function getMediaBufferAndExt(message) {
     const m = message.message || {};
@@ -96,6 +96,6 @@ async function urlCommand(sock, chatId, message) {
     }
 }
 
-export default urlCommand;
+module.exports = urlCommand;
 
 

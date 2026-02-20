@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { downloadContentFromMessage } from '@whiskeysockets/baileys';
-import { uploadImage } from '../lib/uploadImage.js';
+const axios = require('axios');
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+const { uploadImage } = require('../lib/uploadImage');
 
 async function getQuotedOrOwnImageUrl(sock, message) {
     // 1) Quoted image (highest priority)
@@ -194,6 +194,6 @@ async function miscCommand(sock, chatId, message, args) {
     }
 }
 
-export default { miscCommand, handleHeart };
+module.exports = { miscCommand, handleHeart };
 
 

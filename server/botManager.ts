@@ -61,21 +61,33 @@ export class BotManager {
     instance.pairingCode = null;
     instance.qr = null;
     
+    const bootLogs = [
+      "Initializing...",
+      "Initialized",
+      "Starting bot...",
+      "Bot started",
+      "Checking for session file..."
+    ];
+
+    for (const logMsg of bootLogs) {
+      this.log(userId, "info", logMsg);
+      // Wait a bit to simulate the sequence
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
     try {
       const userAuthDir = userId === "default" ? this.authDir : path.join(this.authDir, userId);
       let sessionExists = false;
 
       if (!forceNewSession) {
         sessionExists = await downloadSession(userId, this.authDir);
-      } else {
-        sessionExists = await fs.pathExists(path.join(userAuthDir, 'creds.json'));
       }
 
       if (sessionExists) {
-        this.log(userId, "info", "Session found");
+        this.log(userId, "info", "Session file found");
         this.log(userId, "info", "Establishing connection...");
       } else {
-        this.log(userId, "info", "No session found. Please link bot.");
+        this.log(userId, "info", "No session file found. Please link the bot again.");
         if (forceNewSession) {
           await fs.remove(userAuthDir);
         }
@@ -110,8 +122,10 @@ export class BotManager {
         await uploadSession(userId, this.authDir);
       });
 
+      // Pairing code logic
       if (!instance.sock.authState.creds.registered) {
         if (phoneNumber) {
+          // No log here to avoid premature linking message
           setTimeout(async () => {
             try {
               if (instance.sock && !instance.sock.authState.creds.registered && instance.sock.ws.isOpen) {
@@ -169,20 +183,8 @@ export class BotManager {
         if (m.type === "notify") {
           for (const msg of m.messages) {
             if (instance.sock) {
-              try {
-                const antideleteModule = await import('./commands/antidelete.js');
-                const antidelete = antideleteModule.default || antideleteModule;
-                
-                if (msg.message?.protocolMessage) {
-                  await antidelete.handleMessageRevocation(instance.sock, msg);
-                } else {
-                  await antidelete.storeMessage(instance.sock, msg);
-                }
-
-                await handleCommand(instance.sock, msg, userId);
-              } catch (cmdErr) {
-                this.log(userId, "error", `Command handling error: ${cmdErr}`);
-              }
+              // Ensure we pass the correct userId for session-specific settings
+              await handleCommand(instance.sock, msg, userId);
             }
           }
         }
@@ -218,25 +220,12 @@ export class BotManager {
     }
   }
 
-  private logListeners: Map<string, Set<(log: any) => void>> = new Map();
-
-  public subscribeLogs(userId: string, listener: (log: any) => void) {
-    if (!this.logListeners.has(userId)) {
-      this.logListeners.set(userId, new Set());
-    }
-    this.logListeners.get(userId)!.add(listener);
-    return () => {
-      this.logListeners.get(userId)?.delete(listener);
-    };
-  }
-
   private async log(userId: string, level: "info" | "warn" | "error", message: string) {
-    const logData = { level, message, timestamp: new Date().toISOString(), userId };
     console.log(`[${userId.toUpperCase()}] [${level.toUpperCase()}] ${message}`);
-    
-    const listeners = this.logListeners.get(userId);
-    if (listeners) {
-      listeners.forEach(listener => listener(logData));
+    if (userId !== "default") {
+      await storage.addUserLog(userId, level, message);
+    } else {
+      await storage.addLog(level, message);
     }
   }
 }

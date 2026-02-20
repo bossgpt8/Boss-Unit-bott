@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 async function handleSsCommand(sock, chatId, message, match) {
     if (!match) {
@@ -52,6 +52,6 @@ async function handleSsCommand(sock, chatId, message, match) {
     }
 }
 
-export default {
+module.exports = {
     handleSsCommand
 }; 

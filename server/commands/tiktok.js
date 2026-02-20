@@ -1,6 +1,6 @@
-const { exec } = (await import('child_process')).default;
-const path = (await import('path')).default;
-const fs = (await import('fs')).default;
+const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 const processedMessages = new Set();
 
@@ -57,7 +57,7 @@ async function tiktokCommand(sock, chatId, senderId, mentionedJids, message, arg
                 await sock.sendMessage(chatId, {
                     video: { url: finalPath },
                     mimetype: "video/mp4",
-                    caption: `${title}\n\n> *ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ ʙʏ ʙᴏss ʙᴏᴛ*`
+                    caption: `*${title}*\n\n> *_Downloaded by Boss MD_*`
                 }, { quoted: message });
 
                 if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -70,4 +70,4 @@ async function tiktokCommand(sock, chatId, senderId, mentionedJids, message, arg
     }
 }
 
-export default tiktokCommand;
+module.exports = tiktokCommand;

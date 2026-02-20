@@ -1,6 +1,6 @@
-const { exec } = (await import('child_process')).default;
-const path = (await import('path')).default;
-const fs = (await import('fs')).default;
+const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 async function instagramCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -30,7 +30,7 @@ async function instagramCommand(sock, chatId, senderId, mentionedJids, message, 
             await sock.sendMessage(chatId, {
                 video: { url: filePath },
                 mimetype: "video/mp4",
-                caption: "> *ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ ʙʏ ʙᴏss ʙᴏᴛ*"
+                caption: "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 𝗕𝗢𝗦𝗦-𝗕𝗢𝗧"
             }, { quoted: message });
 
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -41,4 +41,4 @@ async function instagramCommand(sock, chatId, senderId, mentionedJids, message, 
     }
 }
 
-export default instagramCommand;
+module.exports = instagramCommand;

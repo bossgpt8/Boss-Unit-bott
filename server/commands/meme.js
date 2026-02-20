@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 async function memeCommand(sock, chatId, message) {
     try {
@@ -31,4 +31,4 @@ async function memeCommand(sock, chatId, message) {
     }
 }
 
-export default memeCommand;
+module.exports = memeCommand;

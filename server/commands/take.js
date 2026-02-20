@@ -1,8 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-import { downloadMediaMessage } from '@whiskeysockets/baileys';
-import webp from 'node-webpmux.js';
-import crypto from 'crypto';
+const fs = require('fs');
+const path = require('path');
+const { downloadMediaMessage } = require('@whiskeysockets/baileys');
+const webp = require('node-webpmux');
+const crypto = require('crypto');
 
 async function takeCommand(sock, chatId, message, args) {
     try {
@@ -78,4 +78,4 @@ async function takeCommand(sock, chatId, message, args) {
     }
 }
 
-export default takeCommand; 
+module.exports = takeCommand; 

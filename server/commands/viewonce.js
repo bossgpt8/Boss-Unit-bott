@@ -1,4 +1,4 @@
-import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 
 async function viewonceCommand(sock, chatId, sender, mentionedJids, message, args, quotedParticipant) {
     try {
@@ -46,4 +46,4 @@ async function viewonceCommand(sock, chatId, sender, mentionedJids, message, arg
     }
 }
 
-export default viewonceCommand;
+module.exports = viewonceCommand;

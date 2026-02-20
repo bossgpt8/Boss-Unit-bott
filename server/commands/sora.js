@@ -1,4 +1,4 @@
-import axios from 'axios';
+const axios = require('axios');
 
 async function soraCommand(sock, chatId, message) {
     try {
@@ -40,6 +40,6 @@ async function soraCommand(sock, chatId, message) {
     }
 }
 
-export default soraCommand;
+module.exports = soraCommand;
 
 

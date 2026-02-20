@@ -1,7 +1,7 @@
 async function logoutCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     try {
         // Check if user is owner/sudo
-        import { storage } from '../storage.js';
+        const { storage } = require('../storage');
         const settings = userId ? await storage.getUserSettings(userId) : await storage.getSettings();
         const isOwner = settings.ownerNumber === senderId.split('@')[0];
 
@@ -20,7 +20,7 @@ async function logoutCommand(sock, chatId, senderId, mentionedJids, message, arg
             }, { quoted: message });
 
             // Call botManager logout
-            import { botManager } from '../botManager.js';
+            const { botManager } = require('../botManager');
             await botManager.logout();
 
             await sock.sendMessage(chatId, {
@@ -45,4 +45,4 @@ async function logoutCommand(sock, chatId, senderId, mentionedJids, message, arg
     }
 }
 
-export default logoutCommand;
+module.exports = logoutCommand;

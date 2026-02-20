@@ -1,4 +1,4 @@
-import isAdmin from '../lib/isAdmin.js';
+const isAdmin = require('../lib/isAdmin');
 
 async function tagAllCommand(sock, chatId, senderId, mentionedJids, message, args) {
     const isGroup = chatId.endsWith('@g.us');
@@ -46,4 +46,4 @@ async function tagAllCommand(sock, chatId, senderId, mentionedJids, message, arg
     }
 }
 
-export default tagAllCommand;
+module.exports = tagAllCommand;

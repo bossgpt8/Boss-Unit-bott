@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
 const antilinkFilePath = path.join(__dirname, '../data', 'antilinkSettings.json');
 
@@ -26,7 +26,7 @@ function getAntilinkSetting(groupId) {
     return settings[groupId] || 'off';
 }
 
-export default {
+module.exports = {
     setAntilinkSetting,
     getAntilinkSetting
 };

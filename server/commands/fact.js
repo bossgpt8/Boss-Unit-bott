@@ -1,4 +1,4 @@
-import axios from 'axios';
+const axios = require('axios');
 
 async function factCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -11,4 +11,4 @@ async function factCommand(sock, chatId, senderId, mentionedJids, message, args)
     }
 }
 
-export default factCommand;
+module.exports = factCommand;

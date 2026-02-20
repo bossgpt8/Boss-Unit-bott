@@ -1,4 +1,4 @@
-import isAdmin from '../lib/isAdmin.js';
+const isAdmin = require('../lib/isAdmin');
 
 async function promoteCommand(sock, chatId, senderId, mentionedJids, message, args, quotedParticipant) {
     const isGroup = chatId.endsWith('@g.us');
@@ -58,4 +58,4 @@ async function promoteCommand(sock, chatId, senderId, mentionedJids, message, ar
     }
 }
 
-export default promoteCommand;
+module.exports = promoteCommand;

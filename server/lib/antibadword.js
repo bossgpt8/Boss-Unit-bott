@@ -1,6 +1,6 @@
 const { setAntiBadword, getAntiBadword, removeAntiBadword, incrementWarningCount, resetWarningCount } = require('../lib/index');
-import fs from 'fs';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
 // Load antibadword config
 function loadAntibadwordConfig(groupId) {
@@ -213,7 +213,7 @@ async function handleBadwordDetection(sock, chatId, message, userMessage, sender
     }
 }
 
-export default {
+module.exports = {
     handleAntiBadwordCommand,
     handleBadwordDetection
 }; 

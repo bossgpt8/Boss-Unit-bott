@@ -14,24 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 }
 Object.defineProperty(exports, "__esModule", { value: true })
 
-import axios from 'axios'
-import cheerio from 'cheerio.js'
+const axios = require("axios")
+const cheerio = require("cheerio")
 const { resolve } = require("path")
-import util from 'util'
+const util = require("util")
 let BodyForm = require('form-data')
 let { fromBuffer } = require('file-type')
 //let fetch = require('node-fetch')
 let fs = require('fs')
-import child_process from 'child_process'
-import ffmpeg from 'fluent-ffmpeg'
+const child_process = require('child_process')
+const ffmpeg = require('fluent-ffmpeg')
 
 const {unlink } = require ('fs').promises
 
 
-export const sleep = async (ms) => {
+exports.sleep = async (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-export const fetchJson = async (url, options) => {
+exports.fetchJson = async (url, options) => {
     try {
         options ? options : {}
         const res = await axios({
@@ -47,7 +47,7 @@ export const fetchJson = async (url, options) => {
         return err
     }
 }
-export const fetchBuffer = async (url, options) => {
+exports.fetchBuffer = async (url, options) => {
 	try {
 		options ? options : {}
 		const res = await axios({
@@ -104,7 +104,7 @@ exports.webp2mp4File=async(path) =>{
 	})
 }
 
-export const fetchUrl = async (url, options) => {
+exports.fetchUrl = async (url, options) => {
     try {
         options ? options : {}
         const res = await axios({
@@ -121,21 +121,21 @@ export const fetchUrl = async (url, options) => {
     }
 }
 
-export const WAVersion = async () => {
+exports.WAVersion = async () => {
     let get = await exports.fetchUrl("https://web.whatsapp.com/check-update?version=1&platform=web")
     let version = [get.currentVersion.replace(/[.]/g, ", ")]
     return version
 }
 
-export const getRandom = (ext) => {
+exports.getRandom = (ext) => {
     return `${Math.floor(Math.random() * 10000)}${ext}`
 }
 
-export const isUrl = (url) => {
+exports.isUrl = (url) => {
     return url.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/, 'gi'))
 }
 
-export const isNumber = (number) => {
+exports.isNumber = (number) => {
     const int = parseInt(number)
     return typeof int === 'number' && !isNaN(int)
 }
@@ -162,7 +162,7 @@ exports.TelegraPh= (Path) =>{
 const sleepy = async (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-export const buffergif = async (image) => {
+exports.buffergif = async (image) => {
         
 	const filename = `${Math.random().toString(36)}`
 			await fs.writeFileSync(`./XeonMedia/trash/${filename}.gif`, image)

@@ -1,10 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import fetch from 'node-fetch';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const fs = require('fs');
+const path = require('path');
+const fetch = require('node-fetch');
 
 const USER_GROUP_DATA = path.join(__dirname, '../data/userGroupData.json');
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
@@ -58,7 +54,7 @@ async function showTyping(sock, chatId) {
     } catch (error) {}
 }
 
-export async function handleChatbotCommand(sock, chatId, senderId, mentionedJids, message, args) {
+async function handleChatbotCommand(sock, chatId, senderId, mentionedJids, message, args) {
     const match = args && args.length > 0 ? args[0].toLowerCase() : '';
     const data = loadUserGroupData();
     
@@ -70,7 +66,7 @@ export async function handleChatbotCommand(sock, chatId, senderId, mentionedJids
         }, { quoted: message });
     }
 
-    const isOwnerOrSudo = (await import('../lib/isOwner.js')).default;
+    const isOwnerOrSudo = require('../lib/isOwner');
     const isOwner = await isOwnerOrSudo(senderId, sock, chatId);
     
     // In multi-user mode, use currentUserId for owner check
@@ -130,7 +126,7 @@ export async function handleChatbotCommand(sock, chatId, senderId, mentionedJids
     return sock.sendMessage(chatId, { text: '*Invalid command. Use .chatbot to see usage*' }, { quoted: message });
 }
 
-export async function handleChatbotResponse(sock, chatId, message, userMessage, senderId) {
+async function handleChatbotResponse(sock, chatId, message, userMessage, senderId) {
     const data = loadUserGroupData();
     const isPrivate = !chatId.endsWith('@g.us');
     
@@ -208,16 +204,11 @@ export async function handleChatbotResponse(sock, chatId, message, userMessage, 
         if (response) {
             // Add bot response to memory
             addToConversation(senderId, 'assistant', response);
-            const unicodeResponse = response.split('\n').map(line => {
-                return line.replace(/[a-z]/gi, char => {
-                    const code = char.toLowerCase().charCodeAt(0) - 97;
-                    return code >= 0 && code < 26 ? "ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ"[code] : char;
-                });
-            }).join('\n');
-            await sock.sendMessage(chatId, { text: unicodeResponse + "\n\n> *ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ ʙʏ ʙᴏss ʙᴏᴛ*" }, { quoted: message });
+            await sock.sendMessage(chatId, { text: response }, { quoted: message });
         } else {
-            // No error message for user, just log it internally
-            console.error('AI failed to respond for', senderId);
+            await sock.sendMessage(chatId, { 
+                text: "hmm, I'm having a bit of trouble thinking rn 😅 try again in a sec?" 
+            }, { quoted: message });
         }
     } catch (error) {
         console.error('Error in chatbot response:', error.message);
@@ -257,8 +248,8 @@ Examples of good responses:
     if (OPENROUTER_API_KEY) {
         const models = [
             'qwen/qwen-2.5-72b-instruct',
-            'meta-llama/llama-3.3-70b-instruct',
-            'meta-llama/llama-3.1-405b-instruct'
+            'meta-llama/llama-3.1-405b-instruct',
+            'qwen/qwen-2.5-7b-instruct'
         ];
         
         for (const model of models) {
@@ -322,4 +313,8 @@ Examples of good responses:
     return null;
 }
 
-export const execute = handleChatbotCommand;
+module.exports = { 
+    execute: handleChatbotCommand,
+    handleChatbotCommand, 
+    handleChatbotResponse 
+};

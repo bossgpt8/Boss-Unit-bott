@@ -1,4 +1,4 @@
-import isAdmin from '../lib/isAdmin.js';
+const isAdmin = require('../lib/isAdmin');
 
 async function tagNotAdminCommand(sock, chatId, senderId, message) {
     try {
@@ -35,6 +35,6 @@ async function tagNotAdminCommand(sock, chatId, senderId, message) {
     }
 }
 
-export default tagNotAdminCommand;
+module.exports = tagNotAdminCommand;
 
 

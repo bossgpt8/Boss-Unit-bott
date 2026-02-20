@@ -1,4 +1,4 @@
-import isAdmin from '../lib/isAdmin.js';
+const isAdmin = require('../lib/isAdmin');
 
 async function demoteCommand(sock, chatId, senderId, mentionedJids, message, args, quotedParticipant) {
     const isGroup = chatId.endsWith('@g.us');
@@ -57,4 +57,4 @@ async function demoteCommand(sock, chatId, senderId, mentionedJids, message, arg
     }
 }
 
-export default demoteCommand;
+module.exports = demoteCommand;

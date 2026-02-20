@@ -1,11 +1,11 @@
-import axios from 'axios';
-import { exec } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import webp from 'node-webpmux.js';
-import crypto from 'crypto';
-import settings from '../settings.js';
-import { stickercropFromBuffer } from './stickercrop.js';
+const axios = require('axios');
+const { exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const webp = require('node-webpmux');
+const crypto = require('crypto');
+const settings = require('../settings');
+const { stickercropFromBuffer } = require('./stickercrop');
 
 async function convertBufferToStickerWebp(inputBuffer, isAnimated, cropSquare) {
     const tmpDir = path.join(process.cwd(), 'tmp');
@@ -323,6 +323,6 @@ async function forceMiniSticker(inputBuffer, isVideo, cropSquare) {
     return finalBuffer;
 }
 
-export default { igsCommand };
+module.exports = { igsCommand };
 
 

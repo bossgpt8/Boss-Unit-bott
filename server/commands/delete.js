@@ -1,4 +1,4 @@
-import isAdmin from '../lib/isAdmin.js';
+const isAdmin = require('../lib/isAdmin');
 
 async function deleteCommand(sock, chatId, senderId, mentionedJids, message, args) {
     const isGroup = chatId.endsWith('@g.us');
@@ -45,4 +45,4 @@ async function deleteCommand(sock, chatId, senderId, mentionedJids, message, arg
     }
 }
 
-export default deleteCommand;
+module.exports = deleteCommand;

@@ -1,6 +1,6 @@
-import { exec } from 'child_process';
-import path from 'path';
-import fs from 'fs';
+const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 async function songCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -29,7 +29,7 @@ async function songCommand(sock, chatId, senderId, mentionedJids, message, args)
             const fileName = `${title.replace(/[/\\?%*:|"<>]/g, '-')}.mp3`;
             const filePath = path.join(tmpDir, `song_${Date.now()}.mp3`);
 
-            import { channelInfo } from '../lib/messageConfig.js';
+            const { channelInfo } = require("../lib/messageConfig");
             const metadataMsg = `🎧 *ᴀᴜᴅɪᴏ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ* 🎶
 
 • *ᴛɪᴛʟᴇ   : ${title}*
@@ -56,7 +56,7 @@ async function songCommand(sock, chatId, senderId, mentionedJids, message, args)
                 const stats = fs.statSync(filePath);
                 const fileSizeMB = stats.size / (1024 * 1024);
 
-                import { channelInfo } from '../lib/messageConfig.js';
+                const { channelInfo } = require("../lib/messageConfig");
                 if (fileSizeMB > 100) {
                     await sock.sendMessage(chatId, {
                         document: { url: filePath },
@@ -83,4 +83,4 @@ async function songCommand(sock, chatId, senderId, mentionedJids, message, args)
     }
 }
 
-export default songCommand;
+module.exports = songCommand;

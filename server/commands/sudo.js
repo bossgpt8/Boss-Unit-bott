@@ -1,4 +1,4 @@
-import { storage } from '../storage.js';
+const { storage } = require('../storage');
 
 function extractMentionedJid(message) {
     const mentioned = message.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
@@ -70,6 +70,6 @@ async function checkIsOwner(senderId, userId) {
     }
 }
 
-export default sudoCommand;
+module.exports = sudoCommand;
 
 

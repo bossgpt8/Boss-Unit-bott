@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { fetchBuffer } from '../lib/myfunc.js';
+const axios = require('axios');
+const { fetchBuffer } = require('../lib/myfunc');
 
 async function imagineCommand(sock, chatId, message) {
     try {
@@ -81,4 +81,4 @@ function enhancePrompt(prompt) {
     return `${prompt}, ${selectedEnhancers.join(', ')}`;
 }
 
-export default imagineCommand; 
+module.exports = imagineCommand; 

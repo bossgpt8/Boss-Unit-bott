@@ -1,4 +1,4 @@
-import isAdmin from '../lib/isAdmin.js';
+const isAdmin = require('../lib/isAdmin');
 
 async function kickCommand(sock, chatId, senderId, mentionedJids, message, args, quotedParticipant) {
     const isGroup = chatId.endsWith('@g.us');
@@ -67,4 +67,4 @@ async function kickCommand(sock, chatId, senderId, mentionedJids, message, args,
     }
 }
 
-export default kickCommand;
+module.exports = kickCommand;

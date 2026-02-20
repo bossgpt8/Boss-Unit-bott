@@ -1,4 +1,4 @@
-import axios from 'axios';
+const axios = require('axios');
 
 async function characterCommand(sock, chatId, message) {
     let userToAnalyze;
@@ -94,4 +94,4 @@ async function characterCommand(sock, chatId, message) {
     }
 }
 
-export default characterCommand;
+module.exports = characterCommand;

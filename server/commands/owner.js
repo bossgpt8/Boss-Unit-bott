@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
 async function ownerCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -7,7 +7,7 @@ async function ownerCommand(sock, chatId, senderId, mentionedJids, message, args
         let botOwner = 'Boss';
         
         try {
-            import settings from '../settings.js';
+            const settings = require('../settings');
             ownerNumber = settings.ownerNumber || ownerNumber;
             botOwner = settings.botOwner || settings.botName || botOwner;
         } catch (e) {}
@@ -29,7 +29,7 @@ async function ownerCommand(sock, chatId, senderId, mentionedJids, message, args
                     + 'TEL;type=CELL;type=VOICE;waid=' + ownerNumber + ':+' + ownerNumber + '\n'
                     + 'END:VCARD';
 
-        import { channelInfo } from '../lib/messageConfig.js';
+        const { channelInfo } = require("../lib/messageConfig");
         await sock.sendMessage(
             chatId,
             { 
@@ -47,4 +47,4 @@ async function ownerCommand(sock, chatId, senderId, mentionedJids, message, args
     }
 }
 
-export default ownerCommand;
+module.exports = ownerCommand;

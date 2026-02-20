@@ -1,4 +1,4 @@
-import fs from 'fs';
+const fs = require("fs");
 
 async function helpCommand(
   sock,
@@ -23,7 +23,7 @@ async function helpCommand(
     const accessStr = "ᴘᴜʙʟɪᴄ";
     const buildStr = "ᴠ2.0.0";
 
-    import { channelInfo } from '../lib/messageConfig.js';
+    const { channelInfo } = require("../lib/messageConfig");
     const menuText = `*╭━━━━━━━━━━━━━━━━━━━━━━━━━━╮*
 *⚡  ʙᴏss ʙᴏᴛ  ⚡*
 *╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯*
@@ -210,7 +210,7 @@ async function helpCommand(
     );
   } catch (err) {
     console.error("Help error:", err);
-    import { channelInfo } from '../lib/messageConfig.js';
+    const { channelInfo } = require("../lib/messageConfig");
     await sock.sendMessage(
       chatId,
       {
@@ -222,4 +222,4 @@ async function helpCommand(
   }
 }
 
-export default { execute: helpCommand };
+module.exports = { execute: helpCommand };

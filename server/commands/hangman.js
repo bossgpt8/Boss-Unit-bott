@@ -1,4 +1,4 @@
-import fs from 'fs';
+const fs = require('fs');
 
 const words = ['javascript', 'bot', 'hangman', 'whatsapp', 'nodejs'];
 let hangmanGames = {};
@@ -57,4 +57,4 @@ function guessLetter(sock, chatId, letter) {
     }
 }
 
-export default { startHangman, guessLetter };
+module.exports = { startHangman, guessLetter };

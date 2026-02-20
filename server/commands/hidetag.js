@@ -1,7 +1,7 @@
-import isAdmin from '../lib/isAdmin.js';
-import { downloadContentFromMessage } from '@whiskeysockets/baileys';
-import fs from 'fs';
-import path from 'path';
+const isAdmin = require('../lib/isAdmin');
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+const fs = require('fs');
+const path = require('path');
 
 async function downloadMediaMessage(message, mediaType) {
     const stream = await downloadContentFromMessage(message, mediaType);
@@ -73,4 +73,4 @@ async function hideTagCommand(sock, chatId, senderId, mentionedJids, message, ar
     }
 }
 
-export default hideTagCommand;
+module.exports = hideTagCommand;

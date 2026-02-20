@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import axios from 'axios';
-import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 
 function loadState() {
 	try {
@@ -263,6 +263,6 @@ async function setMentionCommand(sock, chatId, message, isOwner) {
 	return sock.sendMessage(chatId, { text: 'Mention reply media updated.' }, { quoted: message });
 }
 
-export default { handleMentionDetection, mentionToggleCommand, setMentionCommand };
+module.exports = { handleMentionDetection, mentionToggleCommand, setMentionCommand };
 
 

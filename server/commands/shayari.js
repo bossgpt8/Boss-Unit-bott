@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 async function shayariCommand(sock, chatId, message) {
     try {
@@ -27,4 +27,4 @@ async function shayariCommand(sock, chatId, message) {
     }
 }
 
-export default { shayariCommand }; 
+module.exports = { shayariCommand }; 

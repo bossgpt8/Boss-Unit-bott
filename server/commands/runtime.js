@@ -42,4 +42,4 @@ async function runtimeCommand(
     }
 }
 
-export default runtimeCommand;
+module.exports = runtimeCommand;

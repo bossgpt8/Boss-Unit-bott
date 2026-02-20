@@ -1,6 +1,6 @@
-const { exec } = (await import('child_process')).default;
-const path = (await import('path')).default;
-const fs = (await import('fs')).default;
+const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 async function facebookCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -33,7 +33,7 @@ async function facebookCommand(sock, chatId, senderId, mentionedJids, message, a
             await sock.sendMessage(chatId, {
                 video: { url: finalPath },
                 mimetype: "video/mp4",
-                caption: "> *ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ ʙʏ ʙᴏss ʙᴏᴛ*"
+                caption: "𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗗 𝗕𝗬 𝗕𝗢𝗦𝗦-𝗕𝗢𝗧"
             }, { quoted: message });
 
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -45,4 +45,4 @@ async function facebookCommand(sock, chatId, senderId, mentionedJids, message, a
     }
 }
 
-export default facebookCommand;
+module.exports = facebookCommand;

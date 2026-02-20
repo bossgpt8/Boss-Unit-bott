@@ -1,4 +1,4 @@
-import { storage } from '../storage.js';
+const { storage } = require('../storage');
 
 async function autoStatusCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     try {
@@ -36,7 +36,7 @@ async function autoStatusCommand(sock, chatId, senderId, mentionedJids, message,
     }
 }
 
-export default {
+module.exports = {
     execute: autoStatusCommand,
     autoStatusCommand
 };
@@ -180,7 +180,7 @@ async function handleStatusUpdate(sock, status) {
     }
 }
 
-export default {
+module.exports = {
     autoStatusCommand,
     handleStatusUpdate
 }; 

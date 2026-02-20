@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import isOwnerOrSudo from '../lib/isOwner.js';
+const fs = require('fs');
+const path = require('path');
+const isOwnerOrSudo = require('../lib/isOwner');
 
 // Function to clear a single directory
 function clearDirectory(dirPath) {
@@ -102,4 +102,4 @@ function startAutoClear() {
 // Start the automatic clearing
 startAutoClear();
 
-export default clearTmpCommand; 
+module.exports = clearTmpCommand; 

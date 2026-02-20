@@ -1,10 +1,10 @@
-import { downloadMediaMessage } from '@whiskeysockets/baileys';
-import { exec } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import settings from '../settings.js';
-import webp from 'node-webpmux.js';
-import crypto from 'crypto';
+const { downloadMediaMessage } = require('@whiskeysockets/baileys');
+const { exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const settings = require('../settings');
+const webp = require('node-webpmux');
+const crypto = require('crypto');
 
 async function stickercropCommand(sock, chatId, message) {
     // The message that will be quoted in the reply.
@@ -195,7 +195,7 @@ async function stickercropCommand(sock, chatId, message) {
     }
 }
 
-export default stickercropCommand;
+module.exports = stickercropCommand;
 
 // Helper: convert a raw media buffer to a cropped sticker using same pipeline
 async function stickercropFromBuffer(inputBuffer, isAnimated) {
@@ -253,4 +253,4 @@ async function stickercropFromBuffer(inputBuffer, isAnimated) {
     return finalBuffer;
 }
 
-module.export const stickercropFromBuffer = stickercropFromBuffer;
+module.exports.stickercropFromBuffer = stickercropFromBuffer;

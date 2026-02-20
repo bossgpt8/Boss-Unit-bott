@@ -1,4 +1,4 @@
-import settings from '../settings.js';
+const settings = require('../settings');
 const { isSudo } = require('./index');
 
 async function isOwnerOrSudo(senderId, sock = null, chatId = null) {
@@ -81,4 +81,4 @@ async function isOwnerOrSudo(senderId, sock = null, chatId = null) {
     }
 }
 
-export default isOwnerOrSudo;
+module.exports = isOwnerOrSudo;

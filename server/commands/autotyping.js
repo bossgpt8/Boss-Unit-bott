@@ -1,4 +1,4 @@
-import { storage } from '../storage.js';
+const { storage } = require('../storage');
 
 async function autotypingCommand(sock, chatId, senderId, mentionedJids, message, args, userId) {
     try {
@@ -33,7 +33,7 @@ async function autotypingCommand(sock, chatId, senderId, mentionedJids, message,
     }
 }
 
-export default {
+module.exports = {
     execute: autotypingCommand,
     autotypingCommand
 };
@@ -63,7 +63,7 @@ async function handleAutotypingForMessage(sock, chatId, userMessage) {
     return false;
 }
 
-export default {
+module.exports = {
     execute: autotypingCommand,
     autotypingCommand,
     isAutotypingEnabled,

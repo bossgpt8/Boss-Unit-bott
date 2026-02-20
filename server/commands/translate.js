@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 async function handleTranslateCommand(sock, chatId, message, match) {
     try {
@@ -109,6 +109,6 @@ async function handleTranslateCommand(sock, chatId, message, match) {
     }
 }
 
-export default {
+module.exports = {
     handleTranslateCommand
 }; 

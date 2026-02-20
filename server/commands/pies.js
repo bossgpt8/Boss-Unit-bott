@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 const BASE = 'https://api.shizo.top/pies';
 const VALID_COUNTRIES = ['india','malaysia', 'thailand', 'china', 'indonesia', 'japan', 'korea', 'vietnam'];
@@ -49,4 +49,4 @@ async function piesAlias(sock, chatId, message, country) {
 	}
 }
 
-export default { piesCommand, piesAlias, VALID_COUNTRIES };
+module.exports = { piesCommand, piesAlias, VALID_COUNTRIES };

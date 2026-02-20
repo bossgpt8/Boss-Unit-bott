@@ -1,4 +1,4 @@
-import fs from 'fs'
+const fs = require('fs')
 const STORE_FILE = './baileys_store.json'
 
 // Config: keep last 20 messages per chat (configurable) - More aggressive for lower RAM
@@ -6,7 +6,7 @@ let MAX_MESSAGES = 20
 
 // Try to read config from settings
 try {
-    import settings from '../settings.js'
+    const settings = require('../settings.js')
     if (settings.maxStoreMessages && typeof settings.maxStoreMessages === 'number') {
         MAX_MESSAGES = settings.maxStoreMessages
     }
@@ -122,4 +122,4 @@ const store = {
     }
 }
 
-export default store
+module.exports = store

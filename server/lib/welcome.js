@@ -86,5 +86,5 @@ async function handleGoodbye(sock, chatId, message, match) {
     });
 }
 
-export default { handleWelcome, handleGoodbye };
+module.exports = { handleWelcome, handleGoodbye };
 // This code handles welcome and goodbye messages in a WhatsApp group using the Baileys library.

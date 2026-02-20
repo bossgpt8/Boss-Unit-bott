@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 async function truthCommand(sock, chatId, message) {
     try {
@@ -78,4 +78,4 @@ async function truthCommand(sock, chatId, message) {
     }
 }
 
-export default { truthCommand };
+module.exports = { truthCommand };

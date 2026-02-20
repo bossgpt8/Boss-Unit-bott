@@ -19,4 +19,4 @@ async function eightBallCommand(sock, chatId, question) {
     await sock.sendMessage(chatId, { text: `🎱 ${randomResponse}` });
 }
 
-export default { eightBallCommand };
+module.exports = { eightBallCommand };

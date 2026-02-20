@@ -38,4 +38,4 @@ async function resetlinkCommand(sock, chatId, senderId) {
     }
 }
 
-export default resetlinkCommand; 
+module.exports = resetlinkCommand; 

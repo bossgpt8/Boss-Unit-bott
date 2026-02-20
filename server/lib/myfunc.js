@@ -14,42 +14,42 @@ const {
     delay,
     getContentType
 } = require('@whiskeysockets/baileys')
-import chalk from 'chalk.js'
-import fs from 'fs'
-import Crypto from 'crypto'
-import axios from 'axios'
-import moment from 'moment-timezone.js'
+const chalk = require('chalk')
+const fs = require('fs')
+const Crypto = require('crypto')
+const axios = require('axios')
+const moment = require('moment-timezone')
 const {
     sizeFormatter
 } = require('human-readable')
-import util from 'util'
-import Jimp from 'jimp.js'
+const util = require('util')
+const Jimp = require('jimp')
 const {
     defaultMaxListeners
 } = require('stream')
-import path from 'path'
+const path = require('path')
 const { tmpdir } = require('os')
 
 const unixTimestampSeconds = (date = new Date()) => Math.floor(date.getTime() / 1000)
 
-export const unixTimestampSeconds = unixTimestampSeconds
+exports.unixTimestampSeconds = unixTimestampSeconds
 
-export const generateMessageTag = (epoch) => {
+exports.generateMessageTag = (epoch) => {
     let tag = (0, exports.unixTimestampSeconds)().toString();
     if (epoch)
         tag += '.--' + epoch; // attach epoch if provided
     return tag;
 }
 
-export const processTime = (timestamp, now) => {
+exports.processTime = (timestamp, now) => {
     return moment.duration(now - moment(timestamp * 1000)).asSeconds()
 }
 
-export const getRandom = (ext) => {
+exports.getRandom = (ext) => {
     return `${Math.floor(Math.random() * 10000)}${ext}`
 }
 
-export const getBuffer = async (url, options) => {
+exports.getBuffer = async (url, options) => {
     try {
         options ? options : {}
         const res = await axios({
@@ -68,7 +68,7 @@ export const getBuffer = async (url, options) => {
     }
 }
 
-export const getImg = async (url, options) => {
+exports.getImg = async (url, options) => {
     try {
         options ? options : {}
         const res = await axios({
@@ -87,7 +87,7 @@ export const getImg = async (url, options) => {
     }
 }
 
-export const fetchJson = async (url, options) => {
+exports.fetchJson = async (url, options) => {
     try {
         options ? options : {}
         const res = await axios({
@@ -104,7 +104,7 @@ export const fetchJson = async (url, options) => {
     }
 }
 
-export const runtime = function(seconds) {
+exports.runtime = function(seconds) {
     seconds = Number(seconds);
     var d = Math.floor(seconds / (3600 * 24));
     var h = Math.floor(seconds % (3600 * 24) / 3600);
@@ -117,22 +117,22 @@ export const runtime = function(seconds) {
     return dDisplay + hDisplay + mDisplay + sDisplay;
 }
 
-export const clockString = (ms) => {
+exports.clockString = (ms) => {
     let h = isNaN(ms) ? '--' : Math.floor(ms / 3600000)
     let m = isNaN(ms) ? '--' : Math.floor(ms / 60000) % 60
     let s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60
     return [h, m, s].map(v => v.toString().padStart(2, 0)).join(':')
 }
 
-export const sleep = async (ms) => {
+exports.sleep = async (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export const isUrl = (url) => {
+exports.isUrl = (url) => {
     return url.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/, 'gi'))
 }
 
-export const getTime = (format, date) => {
+exports.getTime = (format, date) => {
     if (date) {
         return moment(date).locale('id').format(format)
     } else {
@@ -140,7 +140,7 @@ export const getTime = (format, date) => {
     }
 }
 
-export const formatDate = (n, locale = 'id') => {
+exports.formatDate = (n, locale = 'id') => {
     let d = new Date(n)
     return d.toLocaleDateString(locale, {
         weekday: 'long',
@@ -153,7 +153,7 @@ export const formatDate = (n, locale = 'id') => {
     })
 }
 
-export const tanggal = (numer) => {
+exports.tanggal = (numer) => {
     const myMonths = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     const myDays = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'];
     const tgl = new Date(numer);
@@ -172,21 +172,21 @@ export const tanggal = (numer) => {
     return `${thisDay}, ${day} - ${myMonths[bulan]} - ${year}`;
 }
 
-export const jam = (numer, options = {}) => {
+exports.jam = (numer, options = {}) => {
     let format = options.format ? options.format : "HH:mm"
     let jam = options?.timeZone ? moment(numer).tz(timeZone).format(format) : moment(numer).format(format)
 
     return `${jam}`
 }
 
-export const formatp = sizeFormatter({
+exports.formatp = sizeFormatter({
     std: 'JEDEC', //'SI' = default | 'IEC' | 'JEDEC'
     decimalPlaces: 2,
     keepTrailingZeroes: false,
     render: (literal, symbol) => `${literal} ${symbol}B`,
 })
 
-export const json = (string) => {
+exports.json = (string) => {
     return JSON.stringify(string, null, 2)
 }
 
@@ -194,14 +194,14 @@ function format(...args) {
     return util.format(...args)
 }
 
-export const logic = (check, inp, out) => {
+exports.logic = (check, inp, out) => {
     if (inp.length !== out.length) throw new Error('Input and Output must have same length')
     for (let i in inp)
         if (util.isDeepStrictEqual(check, inp[i])) return out[i]
     return null
 }
 
-export const generateProfilePicture = async (buffer) => {
+exports.generateProfilePicture = async (buffer) => {
     const jimp = await Jimp.read(buffer)
     const min = jimp.getWidth()
     const max = jimp.getHeight()
@@ -212,7 +212,7 @@ export const generateProfilePicture = async (buffer) => {
     }
 }
 
-export const bytesToSize = (bytes, decimals = 2) => {
+exports.bytesToSize = (bytes, decimals = 2) => {
     if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
@@ -224,7 +224,7 @@ export const bytesToSize = (bytes, decimals = 2) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-export const getSizeMedia = (path) => {
+exports.getSizeMedia = (path) => {
     return new Promise((resolve, reject) => {
         if (/http/.test(path)) {
             axios.get(path)
@@ -243,11 +243,11 @@ export const getSizeMedia = (path) => {
     })
 }
 
-export const parseMention = (text = '') => {
+exports.parseMention = (text = '') => {
     return [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net')
 }
 
-export const getGroupAdmins = (participants) => {
+exports.getGroupAdmins = (participants) => {
     let admins = []
     for (let i of participants) {
         i.admin === "superadmin" ? admins.push(i.id) : i.admin === "admin" ? admins.push(i.id) : ''
@@ -261,7 +261,7 @@ export const getGroupAdmins = (participants) => {
  * @param {Object} m 
  * @param {store} store 
  */
-export const smsg = (XeonBotInc, m, store) => {
+exports.smsg = (XeonBotInc, m, store) => {
     if (!m) return m
     let M = proto.WebMessageInfo
     if (m.key) {
@@ -367,7 +367,7 @@ export const smsg = (XeonBotInc, m, store) => {
 
     return m
 }
-export const reSize = (buffer, ukur1, ukur2) => {
+exports.reSize = (buffer, ukur1, ukur2) => {
     return new Promise(async (resolve, reject) => {
         var baper = await Jimp.read(buffer);
         var ab = await baper.resize(ukur1, ukur2).getBufferAsync(Jimp.MIME_JPEG)

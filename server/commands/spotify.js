@@ -1,6 +1,6 @@
-import { exec } from 'child_process';
-import path from 'path';
-import fs from 'fs';
+const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 async function spotifyCommand(sock, chatId, senderId, mentionedJids, message, args) {
     try {
@@ -57,4 +57,4 @@ async function sendFile(sock, chatId, filePath, query, message) {
     }
 }
 
-export default spotifyCommand;
+module.exports = spotifyCommand;

@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { channelInfo } from '../lib/messageConfig.js';
+const axios = require('axios');
+const { channelInfo } = require('../lib/messageConfig');
 
 async function wastedCommand(sock, chatId, message) {
     let userToWaste;
@@ -53,4 +53,4 @@ async function wastedCommand(sock, chatId, message) {
     }
 }
 
-export default wastedCommand; 
+module.exports = wastedCommand; 

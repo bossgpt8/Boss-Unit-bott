@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
-    "start": "NODE_ENV=production tsx server/index.ts",
+    "start": "node dist/server/index.js",
     "build": "tsc",
     "railway-start": "npm run build && npm start",
     "db:push": "drizzle-kit push"
@@ -116,8 +116,6 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/fs-extra": "^11.0.4",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
     "drizzle-kit": "^0.31.8",
     "tsx": "^4.21.0",
     "typescript": "^5.6.3",

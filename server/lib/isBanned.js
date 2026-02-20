@@ -1,4 +1,4 @@
-import fs from 'fs';
+const fs = require('fs');
 
 function isBanned(userId) {
     try {
@@ -10,4 +10,4 @@ function isBanned(userId) {
     }
 }
 
-export default { isBanned }; 
+module.exports = { isBanned }; 

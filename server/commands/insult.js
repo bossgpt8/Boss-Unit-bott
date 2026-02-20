@@ -180,4 +180,4 @@ async function insultCommand(sock, chatId, message) {
     }
 }
 
-export default { insultCommand };
+module.exports = { insultCommand };
