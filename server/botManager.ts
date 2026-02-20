@@ -61,33 +61,23 @@ export class BotManager {
     instance.pairingCode = null;
     instance.qr = null;
     
-    const bootLogs = [
-      "Initializing...",
-      "Initialized",
-      "Starting bot...",
-      "Bot started",
-      "Checking for session file..."
-    ];
-
-    for (const logMsg of bootLogs) {
-      this.log(userId, "info", logMsg);
-      // Wait a bit to simulate the sequence
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
     try {
       const userAuthDir = userId === "default" ? this.authDir : path.join(this.authDir, userId);
       let sessionExists = false;
 
+      // Always try to download session first if not forcing a new one
       if (!forceNewSession) {
         sessionExists = await downloadSession(userId, this.authDir);
+      } else {
+        // Even if forceNewSession is true, if we have a local creds.json, it might be a reboot
+        sessionExists = await fs.pathExists(path.join(userAuthDir, 'creds.json'));
       }
 
       if (sessionExists) {
-        this.log(userId, "info", "Session file found");
+        this.log(userId, "info", "Session found");
         this.log(userId, "info", "Establishing connection...");
       } else {
-        this.log(userId, "info", "No session file found. Please link the bot again.");
+        this.log(userId, "info", "No session found. Please link bot.");
         if (forceNewSession) {
           await fs.remove(userAuthDir);
         }
@@ -220,13 +210,31 @@ export class BotManager {
     }
   }
 
-  private async log(userId: string, level: "info" | "warn" | "error", message: string) {
-    console.log(`[${userId.toUpperCase()}] [${level.toUpperCase()}] ${message}`);
-    if (userId !== "default") {
-      await storage.addUserLog(userId, level, message);
-    } else {
-      await storage.addLog(level, message);
+  private logListeners: Map<string, Set<(log: any) => void>> = new Map();
+
+  public subscribeLogs(userId: string, listener: (log: any) => void) {
+    if (!this.logListeners.has(userId)) {
+      this.logListeners.set(userId, new Set());
     }
+    this.logListeners.get(userId)!.add(listener);
+    return () => {
+      this.logListeners.get(userId)?.delete(listener);
+    };
+  }
+
+  private async log(userId: string, level: "info" | "warn" | "error", message: string) {
+    const logData = { level, message, timestamp: new Date().toISOString(), userId };
+    console.log(`[${userId.toUpperCase()}] [${level.toUpperCase()}] ${message}`);
+    
+    // Stream to memory listeners (SSE)
+    const listeners = this.logListeners.get(userId);
+    if (listeners) {
+      listeners.forEach(listener => listener(logData));
+    }
+
+    // Only persist user-specific critical info to Firestore if necessary, 
+    // but per requirements, we are removing Firestore bot event logging.
+    // If it's a critical registration event, we could use storage.updateUserSession
   }
 }
 

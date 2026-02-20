@@ -1,35 +1,55 @@
-const { exec } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+const { exec } = require("child_process");
+const path = require("path");
+const fs = require("fs");
 
-async function songCommand(sock, chatId, senderId, mentionedJids, message, args) {
+// ✅ Store pending downloads: key = "chatId_senderId"
+const pendingDownloads = new Map();
+
+async function songCommand(
+    sock,
+    chatId,
+    senderId,
+    mentionedJids,
+    message,
+    args,
+) {
     try {
-        const searchQuery = args && args.length > 0 ? args.join(' ').trim() : '';
-        
+        const searchQuery =
+            args && args.length > 0 ? args.join(" ").trim() : "";
+
         if (!searchQuery) {
-            return await sock.sendMessage(chatId, { 
-                text: "🎵 ᴡʜᴀᴛ sᴏɴɢ ᴅᴏ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ?\n\nUsage: .song <song name>"
-            }, { quoted: message });
+            return await sock.sendMessage(
+                chatId,
+                {
+                    text: "🎵 ᴡʜᴀᴛ sᴏɴɢ ᴅᴏ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ?\n\nUsage: .song <song name>",
+                },
+                { quoted: message },
+            );
         }
 
-        await sock.sendMessage(chatId, {
-            text: "🎧 ᴘʀᴏᴄᴇssɪɴɢ ʏᴏᴜʀ ʀᴇQᴜᴇsᴛ..."
-        }, { quoted: message });
-
-        const tmpDir = path.join(process.cwd(), 'tmp');
+        const tmpDir = path.join(process.cwd(), "tmp");
         if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
-        
+
         const metaCommand = `yt-dlp --print "%(title)s|%(duration_string)s|%(view_count)s|%(uploader)s|%(thumbnail)s" "ytsearch1:${searchQuery}"`;
+
         exec(metaCommand, async (metaError, metaOut) => {
             if (metaError || !metaOut) {
-                return await sock.sendMessage(chatId, { text: "❌ ғᴀɪʟᴇᴅ ᴛᴏ ғᴇᴛᴄʜ ᴠɪᴅᴇᴏ ᴍᴇᴛᴀᴅᴀᴛᴀ." }, { quoted: message });
+                return await sock.sendMessage(
+                    chatId,
+                    {
+                        text: "❌ ғᴀɪʟᴇᴅ ᴛᴏ ғᴇᴛᴄʜ ᴠɪᴅᴇᴏ ᴍᴇᴛᴀᴅᴀᴛᴀ.",
+                    },
+                    { quoted: message },
+                );
             }
 
-            const [title, duration, views, author, thumbnail] = metaOut.trim().split('|');
-            const fileName = `${title.replace(/[/\\?%*:|"<>]/g, '-')}.mp3`;
+            const [title, duration, views, author, thumbnail] = metaOut
+                .trim()
+                .split("|");
+            const fileName = `${title.replace(/[/\\?%*:|"<>]/g, "-")}.mp3`;
             const filePath = path.join(tmpDir, `song_${Date.now()}.mp3`);
 
-            const { channelInfo } = require("../lib/messageConfig");
+            // ✅ Format selection menu - YOUR STYLE PRESERVED
             const metadataMsg = `🎧 *ᴀᴜᴅɪᴏ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ* 🎶
 
 • *ᴛɪᴛʟᴇ   : ${title}*
@@ -38,49 +58,132 @@ async function songCommand(sock, chatId, senderId, mentionedJids, message, args)
 • *ᴀᴜᴛʜᴏʀ   : ${author}*
 • *sᴛᴀᴛᴜs   : ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ...*
 
-> *© Pᴏᴡᴇʀᴇᴅ Bʏ Bᴏss Bᴏᴛ*`;
+✦━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━✦
+*ʀᴇᴘʟʏ ᴡɪᴛʜ ɴᴜᴍʙᴇʀ:*
+1️⃣ 🎧 *ᴀᴜᴅɪᴏ* (ɴᴏʀᴍᴀʟ - ᴘʟᴀʏs ɪɴ ᴄʜᴀᴛ)
+2️⃣ 📁 *ᴅᴏᴄᴜᴍᴇɴᴛ* (ғɪʟᴇ - sᴇɴᴅs ᴀs ᴀᴛᴛᴀᴄʜᴍᴇɴᴛ)
+✦━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━✦
+*© Pᴏᴡᴇʀᴇᴅ Bʏ Bᴏss Bᴏᴛ*`;
 
-            await sock.sendMessage(chatId, { 
-                image: { url: thumbnail },
-                caption: metadataMsg,
-                ...channelInfo
-            }, { quoted: message });
-
-            const command = `yt-dlp -x --audio-format mp3 --output "${filePath}" "ytsearch1:${searchQuery}"`;
-            
-            exec(command, async (error) => {
-                if (error) {
-                    return await sock.sendMessage(chatId, { text: "❌ ᴅᴏᴡɴʟᴏᴀᴅ ғᴀɪʟᴇᴅ." }, { quoted: message });
-                }
-
-                const stats = fs.statSync(filePath);
-                const fileSizeMB = stats.size / (1024 * 1024);
-
-                const { channelInfo } = require("../lib/messageConfig");
-                if (fileSizeMB > 100) {
-                    await sock.sendMessage(chatId, {
-                        document: { url: filePath },
-                        mimetype: "audio/mpeg",
-                        fileName: fileName,
-                        caption: `*${title}*`,
-                        ...channelInfo
-                    }, { quoted: message });
-                } else {
-                    await sock.sendMessage(chatId, {
-                        audio: { url: filePath },
-                        mimetype: "audio/mpeg",
-                        fileName: fileName,
-                        ...channelInfo
-                    }, { quoted: message });
-                }
-
-                if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            // ✅ Store pending download info
+            const key = `${chatId}_${senderId}`;
+            pendingDownloads.set(key, {
+                filePath,
+                fileName,
+                title,
+                thumbnail,
+                searchQuery,
+                timestamp: Date.now(),
             });
-        });
 
+            // ✅ Send metadata with options
+            await sock.sendMessage(
+                chatId,
+                {
+                    image: { url: thumbnail },
+                    caption: metadataMsg,
+                },
+                { quoted: message },
+            );
+
+            // ✅ Auto-cleanup after 2 minutes if no reply
+            setTimeout(() => {
+                const data = pendingDownloads.get(key);
+                if (data) {
+                    sock.sendMessage(
+                        chatId,
+                        { text: "⏰ Request expired. Please try again." },
+                        { quoted: message },
+                    );
+                    if (fs.existsSync(data.filePath))
+                        fs.unlinkSync(data.filePath);
+                }
+                pendingDownloads.delete(key);
+            }, 120000);
+        });
     } catch (error) {
-        console.error('Error in song command:', error);
+        console.error("Error in song command:", error);
+        await sock.sendMessage(
+            chatId,
+            {
+                text: "❌ ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ. ᴘʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ.",
+            },
+            { quoted: message },
+        );
     }
 }
 
-module.exports = songCommand;
+// ✅ Reply handler for format selection (1 = Audio, 2 = Document)
+async function handleSongReply(sock, chatId, senderId, message, replyText) {
+    try {
+        const key = `${chatId}_${senderId}`;
+        const pendingData = pendingDownloads.get(key);
+
+        if (!pendingData) return false;
+
+        const choice = replyText.trim();
+        const { filePath, fileName, title, searchQuery } = pendingData;
+
+        // Download if not already done
+        if (!fs.existsSync(filePath)) {
+            await sock.sendMessage(
+                chatId,
+                { text: "🎧 ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ..." },
+                { quoted: message },
+            );
+
+            const command = `yt-dlp -x --audio-format mp3 --output "${filePath}" "ytsearch1:${searchQuery}"`;
+
+            // ✅ Properly wait for download
+            await new Promise((resolve, reject) => {
+                exec(command, (error) => (error ? reject(error) : resolve()));
+            });
+        }
+
+        // ✅ Send based on user choice
+        if (choice === "2") {
+            // DOCUMENT format
+            await sock.sendMessage(
+                chatId,
+                {
+                    document: { url: filePath },
+                    mimetype: "audio/mpeg",
+                    fileName: fileName,
+                    caption: `🎵 *${title}*\n\n*© Pᴏᴡᴇʀᴇᴅ Bʏ Bᴏss Bᴏᴛ*`,
+                },
+                { quoted: message },
+            );
+        } else {
+            // AUDIO format (default for 1 or any other input)
+            await sock.sendMessage(
+                chatId,
+                {
+                    audio: { url: filePath },
+                    mimetype: "audio/mpeg",
+                    fileName: fileName,
+                },
+                { quoted: message },
+            );
+        }
+
+        // ✅ Cleanup
+        pendingDownloads.delete(key);
+        setTimeout(() => {
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        }, 5000);
+
+        return true;
+    } catch (error) {
+        console.error("Error handling song reply:", error);
+        await sock.sendMessage(
+            chatId,
+            { text: "❌ ғᴀɪʟᴇᴅ ᴛᴏ sᴇɴᴅ sᴏɴɢ." },
+            { quoted: message },
+        );
+        pendingDownloads.delete(`${chatId}_${senderId}`);
+        return true;
+    }
+}
+
+// ✅ Export BOTH functions
+module.exports = { songCommand, handleSongReply };

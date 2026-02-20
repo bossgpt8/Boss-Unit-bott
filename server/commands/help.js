@@ -24,9 +24,9 @@ async function helpCommand(
     const buildStr = "ᴠ2.0.0";
 
     const { channelInfo } = require("../lib/messageConfig");
-    const menuText = `*╭━━━━━━━━━━━━━━━━━━━━━━━━━━╮*
-*⚡  ʙᴏss ʙᴏᴛ  ⚡*
-*╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯*
+    const menuText = `*╭━━━━━━━━━━━━━━━━━━╮*
+  *⚡  ʙᴏss ʙᴏᴛ  ⚡*
+*╰━━━━━━━━━━━━━━━━━━╯*
 
 *━━━━━━━━━━━━━━━━━━━━━━*
 *1️⃣ sʏsᴛᴇᴍ ᴘʀᴏғɪʟᴇ*
@@ -199,12 +199,12 @@ async function helpCommand(
           externalAdReply: {
             ...channelInfo.contextInfo.externalAdReply,
             thumbnailUrl: "https://i.imgur.com/fRaOmQH.jpeg",
-            renderLargerThumbnail: true
-          }
+            renderLargerThumbnail: false,
+          },
         },
         buttons: channelInfo.buttons,
         footer: channelInfo.footer,
-        headerType: 4
+        headerType: 4,
       },
       { quoted: message },
     );

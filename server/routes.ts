@@ -19,15 +19,15 @@ export async function registerRoutes(
 
   // Bot Actions
   app.post(api.bot.action.path, async (req, res) => {
-    const { action, phoneNumber, userId } = req.body;
+    const { action, phoneNumber, userId, forceNewSession } = req.body;
     try {
       switch (action) {
         case "start":
           // Start the bot process - logs will be handled internally with delays
-          botManager.start(phoneNumber, true, userId);
+          botManager.start(phoneNumber, forceNewSession !== undefined ? forceNewSession : true, userId);
           res.json({ 
             success: true, 
-            message: "Initialization sequence started..." 
+            message: "System sequence started..." 
           });
           break;
         case "stop":
@@ -51,11 +51,26 @@ export async function registerRoutes(
     }
   });
 
-  // Logs
+  // Logs SSE Stream
+  app.get("/api/bot/logs/stream", (req, res) => {
+    const userId = (req.query.userId as string) || "default";
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
+
+    const unsubscribe = botManager.subscribeLogs(userId, (log) => {
+      res.write(`data: ${JSON.stringify(log)}\n\n`);
+    });
+
+    req.on("close", () => {
+      unsubscribe();
+    });
+  });
+
+  // Logs (Legacy endpoint - returns empty as we don't persist)
   app.get(api.bot.logs.path, async (req, res) => {
-    const userId = req.query.userId as string;
-    const logs = userId ? await storage.getUserLogs(userId) : await storage.getLogs();
-    res.json(logs);
+    res.json([]);
   });
 
   // Clear Logs
