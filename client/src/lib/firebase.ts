@@ -13,12 +13,13 @@ import {
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDummyKey",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "dummy.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "dummy",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "dummy.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "1",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:1:web:1",
+  apiKey: "AIzaSyBgPu2vu1QeH76l7CLuJXQxzpsmuOfGjpM",
+  authDomain: "boss-bot-b3858.firebaseapp.com",
+  projectId: "boss-bot-b3858",
+  storageBucket: "boss-bot-b3858.firebasestorage.app",
+  messagingSenderId: "626207302410",
+  appId: "1:626207302410:web:9599d4fafe9937d0e990f3",
+  measurementId: "G-64QBPYVFVL"
 };
 
 const app = initializeApp(firebaseConfig);
