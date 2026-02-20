@@ -44,7 +44,7 @@ export default function Home() {
           </div>
           <div className="flex gap-4">
             <button
-              onClick={() => executeAction({ action: "start", userId: currentUserId, forceNewSession: false })}
+              onClick={() => executeAction({ action: "start", userId: currentUserId })}
               disabled={isPending || botStatus === "online" || botStatus === "starting"}
               className="cyber-button flex items-center justify-center gap-2 group px-8"
             >
