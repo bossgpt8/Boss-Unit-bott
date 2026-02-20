@@ -104,6 +104,29 @@ export async function handleCommand(
     ? await storage.getUserSettings(userId)
     : await storage.getSettings();
 
+  // ✅ CHECK FOR SONG FORMAT REPLY (NEW CODE)
+  const replyText =
+    msg.message.conversation || msg.message.extendedTextMessage?.text;
+
+  if (replyText?.trim().match(/^[12]$/)) {
+    try {
+      const songModule = require(path.join(__dirname, "commands/song.js"));
+      if (songModule?.handleSongReply) {
+        const handled = await songModule.handleSongReply(
+          sock,
+          remoteJid,
+          sender,
+          msg,
+          replyText.trim(),
+        );
+        if (handled) return;
+      }
+    } catch (e) {
+      console.error("Song reply handler error:", e);
+    }
+  }
+  // ✅ END OF SONG REPLY HANDLER
+
   if (!content.startsWith(prefix)) {
     if (!isFromMe && settings.autoRead) await sock.readMessages([msg.key]);
     if (isFromMe) return;
@@ -152,28 +175,6 @@ export async function handleCommand(
     msg.message.extendedTextMessage?.contextInfo?.mentionedJid || [];
   const quotedParticipant =
     msg.message.extendedTextMessage?.contextInfo?.participant;
-
-  // ✅ CHECK FOR SONG FORMAT REPLY (NEW CODE)
-  const replyText =
-    msg.message.conversation || msg.message.extendedTextMessage?.text;
-  if (msg.message.extendedTextMessage && replyText?.trim().match(/^[12]$/)) {
-    try {
-      const songModule = require(path.join(__dirname, "commands/song.js"));
-      if (songModule?.handleSongReply) {
-        const handled = await songModule.handleSongReply(
-          sock,
-          remoteJid,
-          sender,
-          msg,
-          replyText.trim(),
-        );
-        if (handled) return;
-      }
-    } catch (e) {
-      console.error("Song reply handler error:", e);
-    }
-  }
-  // ✅ END OF SONG REPLY HANDLER
 
   if (loadedCommands.has(commandName)) {
     try {

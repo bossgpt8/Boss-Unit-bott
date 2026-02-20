@@ -3,8 +3,8 @@ import fs from "fs-extra";
 import path from "path";
 import crypto from "crypto";
 
-const supabaseUrl = process.env.SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const supabaseUrl = process.env.SUPABASE_URL || "https://dummy.supabase.co";
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "dummy-key";
 const ENCRYPTION_KEY = process.env.SESSION_ENCRYPTION_KEY || "your-default-32-char-key-here-12"; // Must be 32 chars
 const supabase = createClient(supabaseUrl, supabaseKey);
 const BUCKET_NAME = "whatsapp-sessions";

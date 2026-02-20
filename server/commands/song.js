@@ -87,7 +87,7 @@ async function songCommand(
             );
 
             // ✅ Auto-cleanup after 2 minutes if no reply
-            setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 const data = pendingDownloads.get(key);
                 if (data) {
                     sock.sendMessage(
@@ -96,10 +96,12 @@ async function songCommand(
                         { quoted: message },
                     );
                     if (fs.existsSync(data.filePath))
-                        fs.unlinkSync(data.filePath);
+                        try { fs.unlinkSync(data.filePath); } catch(e) {}
                 }
                 pendingDownloads.delete(key);
             }, 120000);
+
+            pendingDownloads.get(key).timeoutId = timeoutId;
         });
     } catch (error) {
         console.error("Error in song command:", error);
@@ -153,8 +155,8 @@ async function handleSongReply(sock, chatId, senderId, message, replyText) {
                 },
                 { quoted: message },
             );
-        } else {
-            // AUDIO format (default for 1 or any other input)
+        } else if (choice === "1") {
+            // AUDIO format
             await sock.sendMessage(
                 chatId,
                 {
@@ -164,12 +166,15 @@ async function handleSongReply(sock, chatId, senderId, message, replyText) {
                 },
                 { quoted: message },
             );
+        } else {
+            return false;
         }
 
         // ✅ Cleanup
+        if (pendingData.timeoutId) clearTimeout(pendingData.timeoutId);
         pendingDownloads.delete(key);
         setTimeout(() => {
-            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            if (fs.existsSync(filePath)) try { fs.unlinkSync(filePath); } catch(e) {}
         }, 5000);
 
         return true;
