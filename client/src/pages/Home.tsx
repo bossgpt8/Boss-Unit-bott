@@ -69,6 +69,7 @@ export default function Home() {
               qr={null} 
               pairingCode={status?.pairingCode || null}
               uptime={status?.uptime || 0} 
+              linkedNumber={linkedNumber}
             />
             
             {isOnline && linkedNumber && (

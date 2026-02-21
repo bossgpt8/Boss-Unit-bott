@@ -30,6 +30,7 @@ async function pingCommand(
                 edit: key,
                 contextInfo: cleanContextInfo,
                 footer: channelInfo.footer,
+                mentions: [senderId]
             },
             { quoted: message },
         );

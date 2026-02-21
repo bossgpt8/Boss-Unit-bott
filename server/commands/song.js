@@ -138,51 +138,51 @@ async function handleSongReply(sock, chatId, senderId, message, replyText) {
 
             const command = `yt-dlp -x --audio-format mp3 --output "${filePath}" "ytsearch1:${searchQuery}"`;
 
-            // ✅ Properly wait for download
-            await new Promise((resolve, reject) => {
-                exec(command, (error) => (error ? reject(error) : resolve()));
+            // ✅ Non-blocking download
+            exec(command, async (error) => {
+                if (error) {
+                    console.error("Download error:", error);
+                    await sock.sendMessage(chatId, { text: "❌ Download failed." }, { quoted: message });
+                    pendingDownloads.delete(key);
+                    return;
+                }
+
+                // ✅ Send based on user choice after download finishes
+                if (choice === "2") {
+                    await sock.sendMessage(
+                        chatId,
+                        {
+                            document: { url: filePath },
+                            mimetype: "audio/mpeg",
+                            fileName: fileName,
+                            caption: `🎵 *${title}*\n\n*© Pᴏᴡᴇʀᴇᴅ Bʏ Bᴏss Bᴏᴛ*`,
+                        },
+                        { quoted: message },
+                    );
+                } else {
+                    await sock.sendMessage(
+                        chatId,
+                        {
+                            audio: { url: filePath },
+                            mimetype: "audio/mpeg",
+                            fileName: fileName,
+                        },
+                        { quoted: message },
+                    );
+                }
+
+                // Cleanup
+                if (pendingData.timeoutId) clearTimeout(pendingData.timeoutId);
+                pendingDownloads.delete(key);
+                setTimeout(() => {
+                    if (fs.existsSync(filePath))
+                        try {
+                            fs.unlinkSync(filePath);
+                        } catch (e) {}
+                }, 5000);
             });
+            return true;
         }
-
-        // ✅ Send based on user choice
-        if (choice === "2") {
-            // DOCUMENT format
-            await sock.sendMessage(
-                chatId,
-                {
-                    document: { url: filePath },
-                    mimetype: "audio/mpeg",
-                    fileName: fileName,
-                    caption: `🎵 *${title}*\n\n*© Pᴏᴡᴇʀᴇᴅ Bʏ Bᴏss Bᴏᴛ*`,
-                },
-                { quoted: message },
-            );
-        } else if (choice === "1") {
-            // AUDIO format
-            await sock.sendMessage(
-                chatId,
-                {
-                    audio: { url: filePath },
-                    mimetype: "audio/mpeg",
-                    fileName: fileName,
-                },
-                { quoted: message },
-            );
-        } else {
-            return false;
-        }
-
-        // ✅ Cleanup
-        if (pendingData.timeoutId) clearTimeout(pendingData.timeoutId);
-        pendingDownloads.delete(key);
-        setTimeout(() => {
-            if (fs.existsSync(filePath))
-                try {
-                    fs.unlinkSync(filePath);
-                } catch (e) {}
-        }, 5000);
-
-        return true;
     } catch (error) {
         console.error("Error handling song reply:", error);
         await sock.sendMessage(

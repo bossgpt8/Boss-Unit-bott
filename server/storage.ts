@@ -60,9 +60,10 @@ export class FirestoreStorage implements IStorage {
   }
 
   async addLog(level: string, message: string): Promise<Log> {
-    const logData = { level, message, timestamp: new Date().toISOString() };
-    // Console only, no Firestore persistence for bot logs
+    const logData = { level, message, timestamp: new Date() };
     console.log(`[BOT LOG] [${level.toUpperCase()}] ${message}`);
+    // Also add to default user logs so it shows in dashboard
+    await this.addUserLog("default", level, message);
     return logData as any;
   }
 

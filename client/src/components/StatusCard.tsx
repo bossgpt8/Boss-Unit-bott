@@ -8,9 +8,10 @@ interface StatusCardProps {
   qr: string | null;
   pairingCode: string | null;
   uptime: number;
+  linkedNumber?: string | null;
 }
 
-export function StatusCard({ status, qr, pairingCode, uptime }: StatusCardProps) {
+export function StatusCard({ status, qr, pairingCode, uptime, linkedNumber }: StatusCardProps) {
   const isOnline = status === "online";
   const isStarting = status === "starting";
   const { toast } = useToast();
@@ -70,6 +71,9 @@ export function StatusCard({ status, qr, pairingCode, uptime }: StatusCardProps)
                   <div className="absolute top-0 right-0 w-4 h-4 bg-green-500 rounded-full animate-ping" />
                 </div>
                 <p className="text-primary font-display font-bold text-xs tracking-widest uppercase">DEVICE LINKED</p>
+                {linkedNumber && (
+                  <p className="text-white font-mono text-[10px] mt-2 font-bold tracking-wider">+{linkedNumber}</p>
+                )}
               </motion.div>
             ) : pairingCode ? (
               <motion.div

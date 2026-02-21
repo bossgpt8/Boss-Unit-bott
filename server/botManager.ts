@@ -132,43 +132,44 @@ export class BotManager {
         }
       }
 
-      instance.sock.ev.on("connection.update", async (update: Partial<ConnectionState>) => {
-        const { connection, lastDisconnect } = update;
+    instance.sock.ev.on("connection.update", async (update: Partial<ConnectionState>) => {
+      const { connection, lastDisconnect } = update;
 
-        if (connection === "close") {
-          const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
-          const shouldReconnect = statusCode !== DisconnectReason.loggedOut && statusCode !== DisconnectReason.connectionReplaced;
+      if (connection === "close") {
+        const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
+        const shouldReconnect = statusCode !== DisconnectReason.loggedOut && statusCode !== DisconnectReason.connectionReplaced;
 
-          this.log(userId, "warn", `Connection closed: ${statusCode}, reconnecting: ${shouldReconnect}`);
-          instance.status = "offline";
-          instance.qr = null;
-          instance.pairingCode = null;
+        this.log(userId, "warn", `Connection closed: ${statusCode}, reconnecting: ${shouldReconnect}`);
+        instance.status = "offline";
+        instance.qr = null;
+        instance.pairingCode = null;
 
-          if (shouldReconnect) {
-            this.log(userId, "info", "Auto-reconnecting...");
-            setTimeout(() => this.start(undefined, false, userId), 5000);
-          } else if (statusCode === DisconnectReason.loggedOut) {
-            await fs.remove(userAuthDir);
-            instance.sock = null;
-          }
-        } else if (connection === "open") {
-          instance.status = "online";
-          instance.qr = null;
-          instance.reconnectAttempts = 0;
-          this.log(userId, "info", "Connected to WhatsApp");
-          
-          const user = instance.sock?.user;
-          if (user) {
-            const connectedNumber = user.id.split(":")[0];
-            if (userId !== "default") {
-              await storage.updateUserSession(userId, { linkedWhatsAppNumber: connectedNumber, botActiveStatus: true });
-              await storage.updateUserSettings(userId, { ownerNumber: connectedNumber });
-            } else {
-              await storage.updateSettings({ ownerNumber: connectedNumber });
-            }
+        if (shouldReconnect) {
+          this.log(userId, "info", "Auto-reconnecting...");
+          setTimeout(() => this.start(undefined, false, userId), 5000);
+        } else if (statusCode === DisconnectReason.loggedOut) {
+          await fs.remove(userAuthDir);
+          instance.sock = null;
+        }
+      } else if (connection === "open") {
+        instance.status = "online";
+        instance.qr = null;
+        instance.reconnectAttempts = 0;
+        
+        const user = instance.sock?.user;
+        const connectedNumber = user?.id?.split(":")[0] || "Unknown";
+        this.log(userId, "info", `Connected to WhatsApp: ${connectedNumber}`);
+        
+        if (user) {
+          if (userId !== "default") {
+            await storage.updateUserSession(userId, { linkedWhatsAppNumber: connectedNumber, botActiveStatus: true });
+            await storage.updateUserSettings(userId, { ownerNumber: connectedNumber });
+          } else {
+            await storage.updateSettings({ ownerNumber: connectedNumber });
           }
         }
-      });
+      }
+    });
 
       instance.sock.ev.on("messages.upsert", async (m) => {
         if (m.type === "notify") {

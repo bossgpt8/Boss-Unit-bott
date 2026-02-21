@@ -104,13 +104,22 @@ export async function handleCommand(
     ? await storage.getUserSettings(userId)
     : await storage.getSettings();
 
+  const isCommand = content.startsWith(prefix);
+  const args = isCommand ? content.slice(prefix.length).trim().split(/\s+/) : [];
+  let commandName = args.shift()?.toLowerCase();
+
+  // Log command execution early to ensure it shows up
+  if (isCommand && commandName) {
+    await storage.addUserLog(userId || "default", "info", `User ${senderNumber} used command: ${commandName}`);
+  }
+
   // ✅ CHECK FOR SONG FORMAT REPLY (NEW CODE)
   const replyText =
     msg.message.conversation || msg.message.extendedTextMessage?.text;
 
   if (replyText?.trim().match(/^[12]$/)) {
     try {
-      const songModule = require(path.join(__dirname, "commands/song.js"));
+      const songModule = require("./commands/song.js");
       if (songModule?.handleSongReply) {
         const handled = await songModule.handleSongReply(
           sock,
@@ -127,7 +136,7 @@ export async function handleCommand(
   }
   // ✅ END OF SONG REPLY HANDLER
 
-  if (!content.startsWith(prefix)) {
+  if (!isCommand) {
     if (!isFromMe && settings.autoRead) await sock.readMessages([msg.key]);
     if (isFromMe) return;
     try {
@@ -147,8 +156,6 @@ export async function handleCommand(
     return;
   }
 
-  const args = content.slice(prefix.length).trim().split(/\s+/);
-  let commandName = args.shift()?.toLowerCase();
   if (!commandName) return;
 
   if (COMMAND_ALIASES[commandName]) {
