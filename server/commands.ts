@@ -176,7 +176,18 @@ export async function handleCommand(
     const isOwner = await checkIsOwner(sender, sock, remoteJid);
     if (!isOwner) {
       await sock.sendMessage(remoteJid, {
-        text: "⚠️ Bot is currently in *Private Mode*. Only the owner can use commands.",
+        text: "The bot is currently in private mode.",
+      });
+      return;
+    }
+  }
+
+  const isGroup = remoteJid.endsWith("@g.us");
+  if (settings.publicMode === "inbox" && isGroup && !isFromMe) {
+    const isOwner = await checkIsOwner(sender, sock, remoteJid);
+    if (!isOwner) {
+      await sock.sendMessage(remoteJid, {
+        text: "The bot is currently in inbox-only mode.",
       });
       return;
     }

@@ -8,7 +8,7 @@ export const botSettings = pgTable("bot_settings", {
   botName: text("bot_name").default("Boss"),
   autoRead: boolean("auto_read").default(false),
   autoStatusRead: boolean("auto_status_read").default(false),
-  publicMode: boolean("public_mode").default(true),
+  publicMode: text("public_mode").default("public"), // public, private, inbox
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
@@ -57,7 +57,7 @@ export const userSettings = pgTable("user_settings", {
   antiDelete: boolean("anti_delete").default(false),
   pmBlocker: boolean("pm_blocker").default(false),
   antiCall: boolean("anti_call").default(false),
-  publicMode: boolean("public_mode").default(true),
+  publicMode: text("public_mode").default("public"), // public, private, inbox
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 

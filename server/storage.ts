@@ -34,7 +34,7 @@ const defaultSettings = {
   id: 1, 
   botName: "Boss", 
   ownerNumber: "2349164898577", 
-  publicMode: true, 
+  publicMode: "public", 
   autoRead: false, 
   welcomeEnabled: false, 
   goodbyeEnabled: false, 
@@ -92,7 +92,7 @@ export class MemStorage implements IStorage {
 
   async getUserSettings(userId: string): Promise<UserSettings> {
     if (!userSettingsStore.has(userId)) {
-      userSettingsStore.set(userId, { userId, botName: "Boss", publicMode: true } as any);
+      userSettingsStore.set(userId, { userId, botName: "Boss", publicMode: "public" } as any);
     }
     return userSettingsStore.get(userId)!;
   }
