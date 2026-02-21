@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
-    "start": "node dist/server/index.js",
+    "start": "npm run build && node dist/server/index.js",
     "build": "tsc",
     "railway-start": "npm run build && npm start",
     "db:push": "drizzle-kit push"
