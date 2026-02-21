@@ -36,7 +36,7 @@ localPort = 5000
 externalPort = 80
 
 [deployment]
-deploymentTarget = "autoscale"
-run = ["npm start"]
-build = ["npm run build"]
+deploymentTarget = "vm"
+run = ["npm run start"]
+build = ["npm install && npm run build"]
 publicDir = "dist/public"
