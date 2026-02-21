@@ -88,7 +88,8 @@ if (BOT_ID) {
   };
   botManager.start = newStart;
 
-  async function uploadSessionToPairingServer() {
+  const uploadSessionToPairingServer = async () => {
+    if (!BOT_ID) return;
     const userAuthDir = path.join(process.cwd(), "session", BOT_ID);
     try {
       if (!fs.existsSync(userAuthDir)) {

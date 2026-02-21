@@ -21,7 +21,7 @@ export default function Settings() {
       botName: "Boss",
       autoRead: false,
       autoStatusRead: false,
-      publicMode: true,
+      publicMode: true as any,
     },
   });
 
@@ -133,7 +133,7 @@ export default function Settings() {
                       </div>
                       <FormControl>
                         <Switch
-                          checked={field.value || false}
+                          checked={!!field.value}
                           onCheckedChange={field.onChange}
                           className="data-[state=checked]:bg-primary"
                         />
@@ -155,7 +155,7 @@ export default function Settings() {
                       </div>
                       <FormControl>
                         <Switch
-                          checked={field.value || false}
+                          checked={!!field.value}
                           onCheckedChange={field.onChange}
                           className="data-[state=checked]:bg-primary"
                         />
@@ -177,7 +177,7 @@ export default function Settings() {
                       </div>
                       <FormControl>
                         <Switch
-                          checked={field.value || false}
+                          checked={!!field.value}
                           onCheckedChange={field.onChange}
                           className="data-[state=checked]:bg-primary"
                         />
