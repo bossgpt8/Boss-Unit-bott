@@ -52,7 +52,7 @@ export class MemStorage implements IStorage {
   }
 
   async updateSettings(updates: UpdateBotSettings): Promise<BotSettings> {
-    globalSettings = { ...globalSettings, ...updates };
+    globalSettings = { ...globalSettings, ...updates } as any;
     return globalSettings as any;
   }
 
