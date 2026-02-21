@@ -50,6 +50,7 @@ export class BotManager {
       pairingCode: instance.pairingCode,
       uptime: process.uptime(),
       currentUserId: userId === "default" ? null : userId,
+      linkedWhatsAppNumber: instance.sock?.user?.id?.split(":")[0] || null
     };
   }
 

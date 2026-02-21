@@ -68,9 +68,11 @@ export async function registerRoutes(
     });
   });
 
-  // Logs (Legacy endpoint - returns empty as we don't persist)
+  // Logs (Legacy endpoint - returns from in-memory)
   app.get(api.bot.logs.path, async (req, res) => {
-    res.json([]);
+    const userId = (req.query.userId as string) || "default";
+    const logs = await storage.getUserLogs(userId);
+    res.json(logs);
   });
 
   // Clear Logs

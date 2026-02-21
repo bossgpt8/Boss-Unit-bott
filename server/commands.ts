@@ -178,8 +178,9 @@ export async function handleCommand(
 
   if (loadedCommands.has(commandName)) {
     try {
+      const startTime = Date.now();
       const cmdFunc = loadedCommands.get(commandName);
-      await storage.addLog("info", `Executing ${commandName} for ${sender}`);
+      await storage.addUserLog(userId || "default", "info", `Executing ${commandName} for ${senderNumber}`);
       if (typeof cmdFunc === "function") {
         await cmdFunc(
           sock,
@@ -190,6 +191,8 @@ export async function handleCommand(
           args,
           quotedParticipant,
         );
+        const duration = Date.now() - startTime;
+        console.log(`[INFO] Command ${commandName} executed in ${duration}ms`);
       }
     } catch (err) {
       console.error(`Error in ${commandName}:`, err);
