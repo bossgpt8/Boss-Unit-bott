@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "Node16",  // Critical for import.meta support
-    "moduleResolution": "Node16",
+    "module": "CommonJS",  // Critical change - use CommonJS instead of Node16
+    "moduleResolution": "Node",  // Use classic Node resolution
     "outDir": "./dist",
     "rootDir": "./server",
     "strict": true,
