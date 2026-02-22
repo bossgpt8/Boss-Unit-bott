@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
+import { Analytics } from "@vercel/analytics/react";
 import Home from "@/pages/Home";
 import Settings from "@/pages/Settings";
 import Landing from "@/pages/Landing";
@@ -38,6 +39,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         {isAuthenticated ? <AuthenticatedRouter /> : <Landing />}
+        <Analytics />
       </TooltipProvider>
     </QueryClientProvider>
   );
