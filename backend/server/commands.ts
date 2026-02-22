@@ -2,13 +2,9 @@ import { type WASocket, type proto } from "@whiskeysockets/baileys";
 import { storage } from "./storage";
 import * as fs from "fs";
 import * as path from "path";
-import { fileURLToPath } from "url";
-import { createRequire } from "module";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const require = createRequire(import.meta.url);
-
+// CommonJS-compatible path resolution - NO import.meta needed
+const __dirname = path.dirname(require.main?.filename || __filename);
 const COMMANDS_DIR = path.join(__dirname, "commands");
 const loadedCommands = new Map<string, Function>();
 
@@ -46,7 +42,12 @@ function initCommands() {
       try {
         const commandName = path.basename(file, ".js");
         const filePath = path.join(COMMANDS_DIR, file);
-        delete require.cache[require.resolve(filePath)];
+
+        // Clear require cache for hot-reloading
+        if (require.cache && require.resolve(filePath)) {
+          delete require.cache[require.resolve(filePath)];
+        }
+
         const cmdModule = require(filePath);
         let cmdFunc =
           typeof cmdModule === "function"
@@ -54,6 +55,7 @@ function initCommands() {
             : cmdModule.execute ||
               cmdModule.default ||
               Object.values(cmdModule).find((v) => typeof v === "function");
+
         if (cmdFunc) {
           loadedCommands.set(commandName, cmdFunc);
           console.log(`[INFO] Loaded command: ${commandName}`);
@@ -71,9 +73,11 @@ async function checkIsOwner(
   chatId: string,
 ): Promise<boolean> {
   try {
+    // Use require for dynamic module loading
     const isOwnerOrSudo = require("./lib/isOwner");
     return await isOwnerOrSudo(senderId, sock, chatId);
   } catch (e) {
+    console.error("Error checking owner status:", e);
     return false;
   }
 }
@@ -105,7 +109,7 @@ export async function handleCommand(
     : await storage.getSettings();
 
   const isGroup = remoteJid.endsWith("@g.us");
-  const isOwner = isFromMe || await checkIsOwner(sender, sock, remoteJid);
+  const isOwner = isFromMe || (await checkIsOwner(sender, sock, remoteJid));
 
   if (settings.publicMode === "private" && !isOwner) {
     await sock.sendMessage(remoteJid, {
@@ -122,17 +126,23 @@ export async function handleCommand(
   }
 
   const isCommand = content.startsWith(prefix);
-  const args = isCommand ? content.slice(prefix.length).trim().split(/\s+/) : [];
+  const args = isCommand
+    ? content.slice(prefix.length).trim().split(/\s+/)
+    : [];
   let commandName = args.shift()?.toLowerCase();
 
   // Handle .inbox command directly as requested
   if (isCommand && commandName === "inbox") {
     if (!isOwner) {
-      await sock.sendMessage(remoteJid, { text: "❌ Only bot owner can use this command!" });
+      await sock.sendMessage(remoteJid, {
+        text: "❌ Only bot owner can use this command!",
+      });
       return;
     }
     await storage.updateSettings({ publicMode: "inbox" });
-    await sock.sendMessage(remoteJid, { text: "📥 *Bot Mode: INBOX*\n\nCommands now only work in DMs for non-owners." });
+    await sock.sendMessage(remoteJid, {
+      text: "📥 *Bot Mode: INBOX*\n\nCommands now only work in DMs for non-owners.",
+    });
     return;
   }
 
@@ -141,8 +151,12 @@ export async function handleCommand(
     const logMsg = `User ${senderNumber} used command: ${commandName}`;
     await storage.addUserLog(userId || "default", "info", logMsg);
     // Force emit to subscribers if botManager is available
-    const { botManager } = await import("./botManager");
-    botManager.emitLog(userId || "default", "info", logMsg);
+    try {
+      const { botManager } = require("./botManager");
+      botManager.emitLog(userId || "default", "info", logMsg);
+    } catch (e) {
+      console.error("Error emitting log:", e);
+    }
   }
 
   // ✅ CHECK FOR SONG FORMAT REPLY (NEW CODE)
@@ -209,7 +223,11 @@ export async function handleCommand(
     try {
       const startTime = Date.now();
       const cmdFunc = loadedCommands.get(commandName);
-      await storage.addUserLog(userId || "default", "info", `Executing ${commandName} for ${senderNumber}`);
+      await storage.addUserLog(
+        userId || "default",
+        "info",
+        `Executing ${commandName} for ${senderNumber}`,
+      );
       if (typeof cmdFunc === "function") {
         await cmdFunc(
           sock,
