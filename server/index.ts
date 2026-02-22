@@ -1,10 +1,18 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import "./pairingClient";
 
 const app = express();
+
+// Enable CORS for frontend hosting (Vercel)
+app.use(cors({
+  origin: true, // In production, replace with your Vercel URL
+  credentials: true
+}));
+
 const httpServer = createServer(app);
 
 declare module "http" {
