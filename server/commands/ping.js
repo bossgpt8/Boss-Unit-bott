@@ -10,28 +10,21 @@ async function pingCommand(
 ) {
     try {
         const start = Date.now();
-        
-        // Use a lightweight message to test latency
-        const { key } = await sock.sendMessage(chatId, { text: "Testing latency..." });
-        
         const end = Date.now();
         const ping = end - start;
 
-        const botInfo = `🏓 *ᴘᴏɴɢ! ${ping} ᴍs*`;
+        const botInfo = `🏓 ᴘᴏɴɢ! ${ping} ᴍs`;
 
         await sock.sendMessage(
             chatId,
-            {
-                text: botInfo,
-                edit: key
-            },
-            { quoted: message },
+            { text: botInfo },
+            { quoted: message }, // 👈 THIS MAKES IT A REPLY
         );
     } catch (error) {
         console.error("Error in ping command:", error);
         await sock.sendMessage(
             chatId,
-            { text: "❌ Failed to get bot status: " + error.message },
+            { text: "❌ Failed to get ping: " + error.message },
             { quoted: message },
         );
     }
