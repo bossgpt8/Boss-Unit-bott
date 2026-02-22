@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS", // ← not Node16, regular CommonJS
-    "moduleResolution": "Node", // ← classic Node resolution
-    "outDir": "dist",
-    "rootDir": "server",
+    "target": "ES2022",
+    "module": "Node16",  // Critical for import.meta support
+    "moduleResolution": "Node16",
+    "outDir": "./dist",
+    "rootDir": "./server",
     "strict": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "types": ["node"]
   },
-  "include": ["server/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "include": ["server/**/*"]
 }
