@@ -1,13 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-<<<<<<< HEAD
-    "module": "CommonJS",  // Critical change - use CommonJS instead of Node16
-    "moduleResolution": "Node",  // Use classic Node resolution
-=======
-    "module": "Node16",  // Critical for import.meta support
-    "moduleResolution": "Node16",
->>>>>>> 86db3b2 (Update)
+    "module": "CommonJS", // NOT Node16 - use CommonJS for Node backend
+    "moduleResolution": "Node",
     "outDir": "./dist",
     "rootDir": "./server",
     "strict": true,
@@ -16,9 +11,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"]
   },
-  "include": ["server/**/*"]
-<<<<<<< HEAD
+  "include": ["server/**/*"],
+  "exclude": ["**/*.test.ts", "**/*.spec.ts"]
 }
-=======
-}
->>>>>>> 86db3b2 (Update)
